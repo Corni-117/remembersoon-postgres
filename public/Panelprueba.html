@@ -183,20 +183,7 @@ function verificarSesion() {
     }
   }
 
-  // Redirecciones actualizadas
-  function configurarBotones() {
-    document.querySelector('button[onclick*="Agregar Recordatorio"]').onclick = () => {
-      window.location.href = 'Agregarrecordatorioboton.html';
-    };
-    
-    document.querySelector('button[onclick*="Lista de Recordatorios"]').onclick = () => {
-      window.location.href = 'listaderecordatorios.html';
-    };
-    
-    document.querySelector('button[onclick*="Agregar Paciente"]').onclick = () => {
-      window.location.href = 'agregarnuevopaciente.html';
-    };
-  }
+  // Configurar botones
 
   // Toast de notificación
   const params = new URLSearchParams(window.location.search);
@@ -215,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   mostrarNombreCuidador();
   cargarPacientes();
-  configurarBotones();
+  //configurarBotones();
 });
 
 // Cerrar sesión
