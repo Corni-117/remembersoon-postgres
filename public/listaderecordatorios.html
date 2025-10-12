@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Recordatorios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #edf1f8;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 60px;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 370px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #3366cc;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 25px;
+    }
+
+    .recordatorio {
+      position: relative;
+      margin-bottom: 15px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #000;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .menu-btn {
+      background-color: #2596f3;
+      color: white;
+      font-size: 20px;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+    }
+
+    .menu-options {
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 40px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+
+    .menu-options button {
+      background: none;
+      border: none;
+      padding: 5px 12px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+
+    .menu-options button:hover {
+      background-color: #f0f0f0;
+    }
+	.sin-resultados {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+.recordatorio {
+  position: relative;
+  margin-bottom: 15px; /* o 10px si prefieres menos separación */
+  padding: 12px 16px;   /* me gusta este para mantener el espaciado horizontal */
+  border-radius: 12px;  /* o 8px si buscas esquinas más rectas */
+  color: #000;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.menu-options {
+  display: none;
+  position: absolute;
+  right: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-options button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+}
+
+.menu-options button:hover {
+  background: #f0f0f0;
+}
+.btn-volver {
+      background-color: #3366cc;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+  <h2>Lista de recordatorios</h2>
+  <label for="filtroPaciente">Paciente:</label>
+  <select id="filtroPaciente">
+    <option value="todos">Todos</option>
+    <!-- Opciones se cargarán dinámicamente -->
+  </select>
+
+  <div id="listaRecordatorios"></div>
+  
+  <button class="btn-volver" onclick="volverAlPanel()">Volver al Panel</button>
+    
+  </button>
+</div>
+
+  </div>
+
+  <script>
+  let recordatorios = [];
+  const listaContainer = document.getElementById("listaRecordatorios");
+  const filtroPaciente = document.getElementById("filtroPaciente");
+
+  // Cargar pacientes del cuidador
+  async function cargarPacientes() {
+    try {
+      const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+      
+      if (!usuarioActivo || !usuarioActivo.id) {
+        alert('Debes iniciar sesión primero');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      console.log('👤 Usuario activo:', usuarioActivo);
+
+      // Cargar recordatorios PRIMERO
+      await cargarRecordatorios(usuarioActivo.id);
+      
+      // Luego cargar pacientes para el filtro
+      const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
+      const data = await response.json();
+
+      console.log('📋 Pacientes recibidos:', data);
+
+      if (data.success) {
+        // Llenar filtro de pacientes
+        filtroPaciente.innerHTML = '<option value="todos">Todos los pacientes</option>' +
+          data.pacientes.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('');
+      }
+    } catch (error) {
+      console.error('❌ Error cargando datos:', error);
+      alert('Error cargando datos: ' + error.message);
+    }
+  }
+
+  // Cargar recordatorios del cuidador
+  async function cargarRecordatorios(cuidadorId) {
+    try {
+      console.log('🔍 Cargando recordatorios para cuidador:', cuidadorId);
+      
+      // Usar el endpoint de debug para más información
+      const response = await fetch(`/api/debug/cuidador/${cuidadorId}/recordatorios`);
+      
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('📊 Debug data recibida:', data);
+
+      recordatorios = data.recordatorios || [];
+      console.log(`✅ ${recordatorios.length} recordatorios cargados`);
+
+      // Renderizar TODOS los recordatorios inicialmente
+      renderRecordatorios("todos");
+      
+    } catch (error) {
+      console.error('💥 Error cargando recordatorios:', error);
+      
+      // Fallback: intentar con el endpoint original
+      try {
+        const response = await fetch(`/api/recordatorios/cuidador/${cuidadorId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          recordatorios = data.recordatorios;
+          renderRecordatorios("todos");
+        }
+      } catch (fallbackError) {
+        listaContainer.innerHTML = `
+          <div style="text-align: center; color: #dc2626;">
+            <p>⚠️ Error cargando recordatorios</p>
+            <small>${error.message}</small>
+            <br>
+            <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px;">Reintentar</button>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // Mostrar recordatorios
+  function renderRecordatorios(filtroPacienteId = "todos") {
+    console.log('🎨 Renderizando recordatorios. Filtro:', filtroPacienteId);
+    console.log('📦 Recordatorios disponibles:', recordatorios);
+    
+    listaContainer.innerHTML = "";
+    
+    const recordatoriosFiltrados = filtroPacienteId === "todos" 
+      ? recordatorios 
+      : recordatorios.filter(r => r.paciente_id == filtroPacienteId);
+
+    console.log(`📝 ${recordatoriosFiltrados.length} recordatorios después del filtro`);
+
+    if (recordatoriosFiltrados.length === 0) {
+      const mensaje = filtroPacienteId === "todos" 
+        ? 'No hay recordatorios registrados' 
+        : 'No hay recordatorios para este paciente';
+      
+      listaContainer.innerHTML = `
+        <div style="text-align: center; color: #666; padding: 40px;">
+          <p>📭 ${mensaje}</p>
+          <small>Agrega recordatorios desde el panel principal</small>
+        </div>
+      `;
+      return;
+    }
+
+    recordatoriosFiltrados.forEach(rec => {
+      const div = document.createElement("div");
+      div.className = "recordatorio";
+      div.style.backgroundColor = rec.color_hex || '#f0f0f0';
+      div.style.border = `2px solid ${rec.color_hex || '#ccc'}`;
+      div.innerHTML = `
+        <div style="flex: 1;">
+          <strong>${rec.titulo}</strong><br>
+          <small>${rec.descripcion || 'Sin descripción'}</small><br>
+          <small>📅 ${rec.fecha} ⏰ ${rec.hora}</small><br>
+          <small>👤 ${rec.paciente_nombre} • 🚨 ${rec.prioridad}</small>
+        </div>
+        <button class="menu-btn">⋯</button>
+        <div class="menu-options">
+          <button onclick="editarRecordatorio(${rec.id})">✏️ Editar</button>
+          <button onclick="eliminarRecordatorio(${rec.id})">🗑️ Eliminar</button>
+        </div>
+      `;
+      listaContainer.appendChild(div);
+    });
+
+    // Activar menús desplegables
+    document.querySelectorAll(".menu-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const menu = btn.nextElementSibling;
+        document.querySelectorAll(".menu-options").forEach(m => {
+          if (m !== menu) m.style.display = "none";
+        });
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+        e.stopPropagation();
+      });
+    });
+  }
+
+  // Editar recordatorio
+  function editarRecordatorio(id) {
+    window.location.href = `editar_recordatorio.html?id=${id}`;
+  }
+
+  // Eliminar recordatorio
+  async function eliminarRecordatorio(id) {
+    if (!confirm("¿Estás seguro de eliminar este recordatorio?")) return;
+    
+    try {
+      const response = await fetch(`/api/recordatorios/${id}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Recargar la lista
+        const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+        await cargarRecordatorios(usuarioActivo.id);
+        alert('✅ Recordatorio eliminado');
+      } else {
+        alert('❌ Error eliminando recordatorio: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('⚠️ Error de conexión');
+    }
+  }
+
+  // Filtrar recordatorios por paciente
+  filtroPaciente.addEventListener("change", () => {
+    console.log('🔍 Aplicando filtro:', filtroPaciente.value);
+    renderRecordatorios(filtroPaciente.value);
+  });
+
+  // Cerrar menús al hacer clic fuera
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".menu-options").forEach(menu => {
+      menu.style.display = "none";
+    });
+  });
+
+  // Volver al panel
+  function volverAlPanel() {
+    window.location.href = "Panelprueba.html";
+  }
+
+  // Toast para actualización exitosa
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #22c55e;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 9999;
+  `;
+  toast.textContent = '✅ Recordatorio actualizado con éxito';
+  document.body.appendChild(toast);
+
+  // Mostrar toast si viene de una actualización
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('actualizado') === 'ok') {
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      history.replaceState(null, '', window.location.pathname);
+    }, 3000);
+  }
+
+  // Inicializar
+  document.addEventListener("DOMContentLoaded", cargarPacientes);
+</script>
+</body>
+</html>

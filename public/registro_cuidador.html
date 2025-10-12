@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de Cuidador - REMEMBERSOON</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fc;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .alerta {
+      background-color: #d9edf7;
+      color: #31708f;
+      border: 1px solid #bce8f1;
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    form {
+      max-width: 700px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .fila-contacto {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .fila-contacto input {
+      flex: 1;
+    }
+
+    .color-picker-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .color-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .codigo-generado {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #e6ffe6;
+      color: #2e7d32;
+      border: 1px solid #b2dfdb;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    #btnContinuar {
+      display: none;
+      margin-top: 15px;
+      background-color: #28a745;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="alerta">
+    Estás registrando una cuenta como <strong>cuidador</strong>.
+  </div>
+
+  <h1>Registro de Cuidador</h1>
+
+  <form id="formRegistroCuidador">
+    <h3>Datos del Cuidador</h3>
+    <label for="nombreCuidador">Nombre del cuidador:</label>
+    <input type="text" id="nombreCuidador" required>
+
+    <label for="fechaNacCuidador">Fecha de nacimiento:</label>
+    <input type="date" id="fechaNacCuidador" required>
+
+    <label for="parentesco">Parentesco con el paciente:</label>
+    <input type="text" id="parentesco" required>
+
+    <label for="celularCuidador">Número de celular:</label>
+    <input type="tel" id="celularCuidador" required pattern="[0-9]{10}" placeholder="10 dígitos">
+
+    <label for="correo">Correo electrónico (Gmail):</label>
+    <input type="email" id="correo" required>
+
+    <label for="contrasena">Contraseña:</label>
+    <input type="password" id="contrasena" required>
+
+    <h3>Datos del Paciente</h3>
+    <label for="nombrePaciente">Nombre del paciente:</label>
+    <input type="text" id="nombrePaciente" required>
+
+    <label for="fechaNacPaciente">Fecha de nacimiento:</label>
+    <input type="date" id="fechaNacPaciente" required>
+
+    <label for="condicionesMedicas">Condiciones médicas:</label>
+    <textarea id="condicionesMedicas" rows="3" required></textarea>
+
+    <label for="nivelDemencia">Nivel de demencia:</label>
+    <select id="nivelDemencia" required>
+      <option value="">Seleccione una opción</option>
+      <option value="leve">Demencia leve</option>
+      <option value="moderada">Demencia moderada</option>
+      <option value="severa">Demencia severa</option>
+      <option value="otra">Otra</option>
+    </select>
+
+    <label>Contactos de emergencia:</label>
+    <div class="fila-contacto">
+      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+      <input type="text" placeholder="Nombre del contacto">
+    </div>
+    <div class="fila-contacto">
+      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+      <input type="text" placeholder="Nombre del contacto">
+    </div>
+    <div class="fila-contacto">
+      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+      <input type="text" placeholder="Nombre del contacto">
+    </div>
+
+    <label>Color para identificar al paciente:</label>
+    <div class="color-picker-container">
+      <input type="color" id="colorPaciente" required>
+      <div id="colorPreview" class="color-preview"></div>
+    </div>
+
+    <button type="submit">Registrarse</button>
+
+    <div id="codigoPaciente" class="codigo-generado" style="display: none;"></div>
+    <button id="btnContinuar" type="button">Continuar</button>
+  </form>
+
+  <script src="script.js">
+    
+  </script>
+
+</body>
+</html>
+

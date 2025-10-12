@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de Paciente - REMEMBERSOON</title>
+  <style>
+    /* ⚠️ MANTENER TODOS TUS ESTILOS ACTUALES ⚠️ */
+	.btn-volver {
+      background-color: #3366cc;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      width: 100%;
+    }
+    :root {
+      --color-primary: #2563eb;
+      --color-secondary: #64748b;
+      --color-success: #22c55e;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --color-info: #3b82f6;
+      --color-light: #f8fafc;
+      --color-dark: #1e293b;
+      --color-background: #f1f5f9;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, sans-serif; 
+      background: var(--color-background);
+      color: var(--color-dark);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    header {
+      background: var(--color-primary);
+      color: white;
+      padding: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .patient-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .patient-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    
+    .patient-details h1 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+    }
+    
+    .patient-details p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .codigo-acceso {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+    }
+    
+    .main-content {
+      padding: 25px;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 25px;
+    }
+    
+    .recordatorios-section {
+      background: var(--color-light);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .recordatorios-section h2 {
+      color: var(--color-primary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--color-primary);
+    }
+    
+    .recordatorio {
+      background: white;
+      border-left: 5px solid var(--color-primary);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s;
+    }
+    
+    .recordatorio:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    .recordatorio-info {
+      flex: 1;
+    }
+    
+    .recordatorio-titulo {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: var(--color-dark);
+    }
+    
+    .recordatorio-descripcion {
+      color: var(--color-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .recordatorio-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9rem;
+    }
+    
+    .recordatorio-hora {
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    .recordatorio-prioridad {
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .prioridad-alta {
+      background: var(--color-danger);
+      color: white;
+    }
+    
+    .prioridad-media {
+      background: var(--color-warning);
+      color: white;
+    }
+    
+    .prioridad-baja {
+      background: var(--color-success);
+      color: white;
+    }
+    
+    .btn-reproducir {
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+    }
+    
+    .btn-reproducir:hover {
+      background: #1e40af;
+    }
+    
+    .sin-recordatorios {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--color-secondary);
+    }
+    
+    .sin-recordatorios i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      display: block;
+      color: var(--color-primary);
+    }
+    
+    .sidebar {
+      background: var(--color-light);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    
+    .status-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .status-card h3 {
+      color: var(--color-primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .status-card h3 i {
+      font-size: 1.4rem;
+    }
+    
+    .estado-conexion {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+    
+    .punto-conexion {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    
+    .conectado {
+      background: var(--color-success);
+    }
+    
+    .desconectado {
+      background: var(--color-danger);
+    }
+    
+    .conectando {
+      background: var(--color-warning);
+    }
+    
+    .hora-actual {
+      font-size: 1.8rem;
+      font-weight: bold;
+      text-align: center;
+      color: var(--color-primary);
+      margin: 15px 0;
+    }
+    
+    .fecha-actual {
+      text-align: center;
+      color: var(--color-secondary);
+      margin-bottom: 20px;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    
+    .badge-primary {
+      background: var(--color-primary);
+      color: white;
+    }
+    
+    .badge-secondary {
+      background: var(--color-secondary);
+      color: white;
+    }
+    
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+      
+      .patient-info {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="patient-info">
+        <div class="patient-avatar" id="patientAvatar">P</div>
+        <div class="patient-details">
+          <h1 id="patientName">Cargando nombre...</h1>
+          <p>Panel de recordatorios personalizados</p>
+        </div>
+      </div>
+      <div class="codigo-acceso">
+        Código de acceso: <span id="accessCode">Cargando código...</span>
+      </div>
+    </header>
+    
+    <div class="main-content">
+      <div class="recordatorios-section">
+        <h2><i class="fas fa-bell"></i> Mis Recordatorios</h2>
+        
+        <div id="listaRecordatorios">
+          <div class="sin-recordatorios">
+            <i class="fas fa-spinner fa-spin"></i>
+            <h3>Cargando recordatorios...</h3>
+            <p>Espere mientras se cargan sus recordatorios.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="sidebar">
+        <div class="status-card">
+          <h3><i class="fas fa-speaker"></i> Estado del Altavoz</h3>
+          <div class="estado-conexion">
+            <div class="punto-conexion" id="estadoConexion"></div>
+            <span id="textoConexion">Conectando con el dispositivo...</span>
+          </div>
+          <div class="hora-actual" id="horaActual"></div>
+          <div class="fecha-actual" id="fechaActual"></div>
+        </div>
+        
+        <div class="status-card">
+          <h3><i class="fas fa-info-circle"></i> Información</h3>
+          <p>Los recordatorios se reproducirán automáticamente en el altavoz conectado a la hora programada.</p>
+          <p>También puedes reproducirlos manualmente haciendo clic en el botón <i class="fas fa-play"></i>.</p>
+        </div>
+		<button class="btn-volver" onclick="volverAlInicio()">Volver al Inicio</button>
+      </div>
+	  
+    </div>
+  </div>
+
+  <script>
+  
+  // Volver al inicio
+    function volverAlInicio() {
+      // Limpiar sesión del paciente
+      localStorage.removeItem('usuarioActivo');
+      window.location.href = 'index.html';
+    }
+  // ⚠️ MANTENIENDO TU DISEÑO - CON FUNCIONALIDAD REAL ⚠️
+
+  // Obtener datos del paciente desde localStorage
+  function obtenerDatosPaciente() {
+    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
+    
+    if (!usuarioActivo) {
+      console.error("No se encontró información de paciente activo");
+      return null;
+    }
+    
+    return usuarioActivo;
+  }
+
+  // Obtener recordatorios del paciente desde el backend
+  async function obtenerRecordatoriosPaciente(pacienteId) {
+    try {
+      const response = await fetch(`/api/recordatorios/paciente/${pacienteId}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.recordatorios || [];
+      } else {
+        console.error('Error en la respuesta del servidor:', response.status);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error obteniendo recordatorios:', error);
+      return [];
+    }
+  }
+
+  // Formatear fecha en español
+  function formatearFecha(fechaString) {
+    const fecha = new Date(fechaString + 'T00:00:00'); // Agregar tiempo para evitar problemas de zona horaria
+    return fecha.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  // Inicializar la página
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Obtener datos del paciente
+    const paciente = obtenerDatosPaciente();
+    
+    if (paciente) {
+      // Mostrar información del paciente
+      document.getElementById('patientName').textContent = paciente.nombre;
+      document.getElementById('accessCode').textContent = paciente.codigo_acceso;
+      
+      // Usar el color del paciente para el avatar
+      if (paciente.color_hex) {
+        document.getElementById('patientAvatar').style.backgroundColor = paciente.color_hex;
+      } else {
+        document.getElementById('patientAvatar').style.backgroundColor = "#3b82f6";
+      }
+      
+      document.getElementById('patientAvatar').textContent = paciente.nombre.charAt(0).toUpperCase();
+      
+      // Mostrar estado de carga
+      document.getElementById('listaRecordatorios').innerHTML = `
+        <div class="sin-recordatorios">
+          <i class="fas fa-spinner fa-spin"></i>
+          <h3>Cargando recordatorios...</h3>
+          <p>Buscando tus recordatorios programados.</p>
+        </div>
+      `;
+      
+      // Obtener y mostrar recordatorios
+      try {
+        const recordatorios = await obtenerRecordatoriosPaciente(paciente.id);
+        renderizarRecordatorios(recordatorios);
+      } catch (error) {
+        console.error('Error cargando recordatorios:', error);
+        mostrarErrorCarga();
+      }
+      
+    } else {
+      // Mostrar mensaje de error
+      mostrarErrorPacienteNoEncontrado();
+    }
+    
+    // Iniciar reloj
+    actualizarReloj();
+    setInterval(actualizarReloj, 1000);
+    
+    // Simular conexión con el dispositivo
+    setTimeout(() => {
+      actualizarEstadoConexion(true);
+    }, 2000);
+  });
+
+  // Función para renderizar recordatorios
+  function renderizarRecordatorios(recordatorios) {
+    const lista = document.getElementById("listaRecordatorios");
+    
+    if (!recordatorios || recordatorios.length === 0) {
+      lista.innerHTML = `
+        <div class="sin-recordatorios">
+          <i class="far fa-bell-slash"></i>
+          <h3>No tienes recordatorios</h3>
+          <p>Tu cuidador aún no ha agregado recordatorios para ti.</p>
+          <p style="font-size: 0.9rem; margin-top: 10px; color: var(--color-secondary);">
+            Los recordatorios aparecerán aquí cuando tu cuidador los agregue.
+          </p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Ordenar recordatorios por fecha y hora
+    recordatorios.sort((a, b) => {
+      const fechaA = new Date(a.fecha + 'T' + a.hora);
+      const fechaB = new Date(b.fecha + 'T' + b.hora);
+      return fechaA - fechaB;
+    });
+    
+    lista.innerHTML = '';
+    
+    recordatorios.forEach(recordatorio => {
+      const elemento = document.createElement("div");
+      elemento.className = `recordatorio`;
+      
+      // Usar el color del paciente para el borde
+      const paciente = obtenerDatosPaciente();
+      elemento.style.borderLeftColor = paciente?.color_hex || "#3b82f6";
+      
+      // Formatear la fecha
+      const fechaFormateada = formatearFecha(recordatorio.fecha);
+      
+      // Determinar si el recordatorio es para hoy
+      const hoy = new Date().toISOString().split('T')[0];
+      const esHoy = recordatorio.fecha === hoy;
+      
+      elemento.innerHTML = `
+        <div class="recordatorio-info">
+          <div class="recordatorio-titulo">
+            ${recordatorio.titulo || 'Recordatorio'}
+            ${esHoy ? '<span class="badge badge-primary" style="margin-left: 10px;">Hoy</span>' : ''}
+          </div>
+          <div class="recordatorio-descripcion">${recordatorio.descripcion || 'Sin descripción adicional'}</div>
+          <div class="recordatorio-meta">
+            <span class="recordatorio-hora">
+              <i class="far fa-clock"></i> ${recordatorio.hora || '00:00'}
+            </span>
+            <span class="recordatorio-prioridad ${'prioridad-' + (recordatorio.prioridad || 'media')}">
+              ${(recordatorio.prioridad || 'media').charAt(0).toUpperCase() + (recordatorio.prioridad || 'media').slice(1)}
+            </span>
+            <span class="badge badge-secondary">${fechaFormateada}</span>
+          </div>
+        </div>
+        <button class="btn-reproducir" data-id="${recordatorio.id}" title="Reproducir recordatorio">
+          <i class="fas fa-play"></i>
+        </button>
+      `;
+      
+      lista.appendChild(elemento);
+    });
+    
+    // Añadir event listeners a los botones de reproducir
+    document.querySelectorAll('.btn-reproducir').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id');
+        reproducirRecordatorio(id);
+      });
+    });
+    
+    console.log(`✅ Mostrando ${recordatorios.length} recordatorios`);
+  }
+  
+  // Función para reproducir un recordatorio (simulación para Raspberry Pi)
+  function reproducirRecordatorio(id) {
+    const paciente = obtenerDatosPaciente();
+    const recordatorios = document.querySelectorAll('.recordatorio');
+    const recordatorio = Array.from(recordatorios).find(r => 
+      r.querySelector('.btn-reproducir').getAttribute('data-id') === id
+    );
+    
+    if (recordatorio) {
+      const titulo = recordatorio.querySelector('.recordatorio-titulo').textContent.split('Hoy')[0].trim();
+      const descripcion = recordatorio.querySelector('.recordatorio-descripcion').textContent;
+      
+      // Simular conexión con Raspberry Pi
+      actualizarEstadoConexion(false, true);
+      
+      console.log("Enviando recordatorio a Raspberry Pi:", {
+        recordatorioId: id,
+        paciente: paciente.nombre,
+        titulo: titulo,
+        descripcion: descripcion
+      });
+      
+      // Simular el envío con animación
+      const btn = recordatorio.querySelector('.btn-reproducir');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled = true;
+      
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.style.background = 'var(--color-success)';
+        
+        // Mostrar notificación
+        mostrarNotificacion(`🔊 Reproduciendo: "${titulo}"`);
+        
+        // Restaurar botón después de 2 segundos
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-play"></i>';
+          btn.style.background = '';
+          btn.disabled = false;
+          actualizarEstadoConexion(true);
+        }, 2000);
+      }, 1500);
+    }
+  }
+  
+  // Función para mostrar notificación
+  function mostrarNotificacion(mensaje) {
+    // Crear elemento de notificación
+    const notificacion = document.createElement('div');
+    notificacion.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--color-success);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    `;
+    
+    // Agregar estilos de animación
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    notificacion.textContent = mensaje;
+    document.body.appendChild(notificacion);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+      notificacion.remove();
+      style.remove();
+    }, 3000);
+  }
+  
+  // Función para actualizar el estado de conexión
+  function actualizarEstadoConexion(conectado = false, conectando = false) {
+    const punto = document.getElementById('estadoConexion');
+    const texto = document.getElementById('textoConexion');
+    
+    if (conectando) {
+      punto.className = 'punto-conexion conectando';
+      texto.textContent = 'Enviando recordatorio al dispositivo...';
+    } else if (conectado) {
+      punto.className = 'punto-conexion conectado';
+      texto.textContent = 'Conectado al dispositivo';
+    } else {
+      punto.className = 'punto-conexion desconectado';
+      texto.textContent = 'Dispositivo no conectado';
+    }
+  }
+  
+  // Función para actualizar el reloj
+  function actualizarReloj() {
+    const ahora = new Date();
+    const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    
+    document.getElementById('horaActual').textContent = ahora.toLocaleTimeString('es-ES', opcionesHora);
+    document.getElementById('fechaActual').textContent = ahora.toLocaleDateString('es-ES', opcionesFecha);
+  }
+
+  // Función para mostrar error de paciente no encontrado
+  function mostrarErrorPacienteNoEncontrado() {
+    document.getElementById('patientName').textContent = "Paciente no encontrado";
+    document.getElementById('accessCode').textContent = "N/A";
+    
+    document.getElementById('listaRecordatorios').innerHTML = `
+      <div class="sin-recordatorios">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>No se pudo cargar la información</h3>
+        <p>No se encontraron datos para este paciente.</p>
+        <p>Por favor, acceda nuevamente con su código.</p>
+        <button onclick="window.location.href='index.html'" style="
+          margin-top: 15px;
+          padding: 10px 20px;
+          background: var(--color-primary);
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        ">Volver al Inicio</button>
+      </div>
+    `;
+  }
+
+  // Función para mostrar error de carga
+  function mostrarErrorCarga() {
+    document.getElementById('listaRecordatorios').innerHTML = `
+      <div class="sin-recordatorios">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Error al cargar recordatorios</h3>
+        <p>No se pudieron cargar los recordatorios en este momento.</p>
+        <p>Por favor, intente más tarde.</p>
+        <button onclick="location.reload()" style="
+          margin-top: 15px;
+          padding: 10px 20px;
+          background: var(--color-primary);
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        ">Reintentar</button>
+      </div>
+    `;
+  }
+
+  // Función para volver al inicio
+  function volverAlInicio() {
+    localStorage.removeItem('usuarioActivo');
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>

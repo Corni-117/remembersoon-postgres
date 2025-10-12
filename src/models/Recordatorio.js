@@ -1,0 +1,94 @@
+const pool = require('../database/db');
+
+class Recordatorio {
+  // Crear nuevo recordatorio
+  static async crear(recordatorioData) {
+    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id } = recordatorioData;
+    
+    try {
+      const query = `
+        INSERT INTO recordatorios (titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *
+      `;
+      
+      const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id];
+      const result = await pool.query(query, values);
+      
+      return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Obtener recordatorios por paciente
+  static async obtenerPorPaciente(pacienteId) {
+    const query = `
+      SELECT r.*, p.nombre as paciente_nombre, p.color_hex
+      FROM recordatorios r
+      JOIN pacientes p ON r.paciente_id = p.id
+      WHERE r.paciente_id = $1
+      ORDER BY r.fecha, r.hora
+    `;
+    const result = await pool.query(query, [pacienteId]);
+    return result.rows;
+  }
+
+  // Obtener recordatorios por cuidador (todos sus pacientes)
+  static async obtenerPorCuidador(cuidadorId) {
+    const query = `
+      SELECT r.*, p.nombre as paciente_nombre, p.color_hex
+      FROM recordatorios r
+      JOIN pacientes p ON r.paciente_id = p.id
+      WHERE p.cuidador_id = $1
+      ORDER BY r.fecha, r.hora
+    `;
+    const result = await pool.query(query, [cuidadorId]);
+    return result.rows;
+  }
+
+  // Actualizar recordatorio
+  static async actualizar(id, recordatorioData) {
+    const { titulo, descripcion, fecha, hora, repetir, prioridad } = recordatorioData;
+    
+    const query = `
+      UPDATE recordatorios 
+      SET titulo = $1, descripcion = $2, fecha = $3, hora = $4, repetir = $5, prioridad = $6
+      WHERE id = $7
+      RETURNING *
+    `;
+    
+    const values = [titulo, descripcion, fecha, hora, repetir, prioridad, id];
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  }
+
+  // Eliminar recordatorio
+  static async eliminar(id) {
+    const query = 'DELETE FROM recordatorios WHERE id = $1 RETURNING *';
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  }
+
+  // Obtener recordatorio por ID
+  static async obtenerPorId(id) {
+    const query = 'SELECT * FROM recordatorios WHERE id = $1';
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  }
+
+  // Obtener recordatorio por ID con información del paciente
+  static async obtenerPorIdCompleto(id) {
+    const query = `
+    SELECT r.*, p.nombre as paciente_nombre, p.color_hex, p.id as paciente_id
+    FROM recordatorios r
+    JOIN pacientes p ON r.paciente_id = p.id
+    WHERE r.id = $1
+  `;
+  const result = await pool.query(query, [id]);
+  return result.rows[0];
+ }
+  
+}
+
+module.exports = Recordatorio;

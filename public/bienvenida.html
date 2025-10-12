@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+  <title>Bienvenida Cuidador</title>
+     <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .welcome-box {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #333333;
+    }
+
+    #nombreCuidador {
+      font-weight: bold;
+      color: #2563eb;
+    }
+
+    .boton-panel {
+      margin-top: 30px;
+      padding: 12px 24px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>  
+</head>
+<body>
+  <div class="welcome-box">
+    <h1>¡Bienvenido, <span id="nombreCuidador">Cuidador</span>!</h1>
+    <p>Tu cuenta ha sido registrada correctamente.</p>
+    <button class="boton-panel" onclick="irAlPanel()">Ir al panel</button>
+  </div>
+
+  <script>
+  // Obtener el usuario activo COMPLETO desde localStorage
+  const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+  
+  if (usuarioActivo && usuarioActivo.nombre) {
+    document.getElementById('nombreCuidador').innerText = usuarioActivo.nombre;
+    console.log('Usuario activo:', usuarioActivo);
+  } else {
+    document.getElementById('nombreCuidador').innerText = 'Cuidador';
+    console.warn('No se encontró usuario activo en bienvenida.html');
+  }
+
+  function irAlPanel() {
+    // Redirigir al panel principal
+    window.location.href = 'Panelprueba.html';
+  }
+</script>
+</body>
+</html>

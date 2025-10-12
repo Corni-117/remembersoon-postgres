@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Recordatorio - REMEMBERSOON</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f5f9;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #1e40af;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .btn-guardar {
+      background-color: #2563eb;
+      color: white;
+    }
+
+    .btn-cancelar {
+      background-color: #6b7280;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .dias-semana {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .dias-semana label {
+      font-weight: normal;
+      margin-right: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Editar Recordatorio</h2>
+    
+    <div id="loading" class="loading">Cargando recordatorio...</div>
+    
+    <form id="formRecordatorio" style="display: none;">
+      <label for="titulo">Título:</label>
+      <input type="text" id="titulo" required>
+
+      <label for="descripcion">Descripción:</label>
+      <textarea id="descripcion" rows="3"></textarea>
+
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" required>
+
+      <label for="hora">Hora:</label>
+      <input type="time" id="hora" required>
+
+      <label for="repetir">Repetir:</label>
+      <select id="repetir">
+        <option value="una_vez">Una sola vez</option>
+        <option value="diario">Diariamente</option>
+        <option value="semanal">Semanalmente</option>
+      </select>
+
+      <div id="diasSemana" class="dias-semana">
+        <label><input type="checkbox" value="Lunes"> Lunes</label>
+        <label><input type="checkbox" value="Martes"> Martes</label>
+        <label><input type="checkbox" value="Miércoles"> Miércoles</label>
+        <label><input type="checkbox" value="Jueves"> Jueves</label>
+        <label><input type="checkbox" value="Viernes"> Viernes</label>
+        <label><input type="checkbox" value="Sábado"> Sábado</label>
+        <label><input type="checkbox" value="Domingo"> Domingo</label>
+      </div>
+
+      <label for="paciente">Paciente:</label>
+      <select id="paciente" required>
+        <!-- Se llenará dinámicamente -->
+      </select>
+
+      <label for="prioridad">Prioridad:</label>
+      <select id="prioridad">
+        <option value="baja">Baja</option>
+        <option value="media">Media</option>
+        <option value="alta">Alta</option>
+      </select>
+
+      <div class="buttons">
+        <button type="button" class="btn-cancelar" onclick="cancelarEdicion()">Cancelar</button>
+        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let recordatorioId = null;
+    const repetirSelect = document.getElementById("repetir");
+    const diasSemanaDiv = document.getElementById("diasSemana");
+
+    // Obtener ID del recordatorio de la URL
+    function obtenerIdDeURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('id');
+    }
+
+    // Cargar datos del recordatorio
+    async function cargarRecordatorio() {
+      recordatorioId = obtenerIdDeURL();
+      
+      if (!recordatorioId) {
+        alert('ID de recordatorio no especificado');
+        window.location.href = 'listaderecordatorios.html';
+        return;
+      }
+
+      try {
+        // Cargar pacientes primero
+        await cargarPacientes();
+        
+        // Cargar datos del recordatorio
+        const response = await fetch(`/api/recordatorios/${recordatorioId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          llenarFormulario(data.recordatorio);
+        } else {
+          throw new Error(data.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error cargando recordatorio: ' + error.message);
+        window.location.href = 'listaderecordatorios.html';
+      }
+    }
+
+    // Cargar pacientes del cuidador
+    async function cargarPacientes() {
+      try {
+        const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+        
+        if (!usuarioActivo || !usuarioActivo.id) {
+          throw new Error('Debes iniciar sesión primero');
+        }
+
+        const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          const selectPaciente = document.getElementById("paciente");
+          selectPaciente.innerHTML = data.pacientes.map(paciente => 
+            `<option value="${paciente.id}">${paciente.nombre}</option>`
+          ).join('');
+        }
+      } catch (error) {
+        console.error('Error cargando pacientes:', error);
+      }
+    }
+
+    // Llenar formulario con datos del recordatorio
+    function llenarFormulario(recordatorio) {
+      document.getElementById("titulo").value = recordatorio.titulo;
+      document.getElementById("descripcion").value = recordatorio.descripcion || '';
+      document.getElementById("fecha").value = recordatorio.fecha;
+      document.getElementById("hora").value = recordatorio.hora;
+      document.getElementById("repetir").value = recordatorio.repetir;
+      document.getElementById("paciente").value = recordatorio.paciente_id;
+      document.getElementById("prioridad").value = recordatorio.prioridad;
+
+      // Mostrar/ocultar días de la semana
+      if (recordatorio.repetir === 'semanal') {
+        diasSemanaDiv.style.display = 'block';
+      }
+
+      // Ocultar loading y mostrar formulario
+      document.getElementById("loading").style.display = 'none';
+      document.getElementById("formRecordatorio").style.display = 'block';
+    }
+
+    // Guardar cambios
+    document.getElementById("formRecordatorio").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const recordatorioData = {
+        titulo: document.getElementById("titulo").value.trim(),
+        descripcion: document.getElementById("descripcion").value.trim(),
+        fecha: document.getElementById("fecha").value,
+        hora: document.getElementById("hora").value,
+        repetir: document.getElementById("repetir").value,
+        prioridad: document.getElementById("prioridad").value,
+        paciente_id: parseInt(document.getElementById("paciente").value)
+      };
+
+      // Validaciones
+      if (!recordatorioData.titulo || !recordatorioData.fecha || !recordatorioData.hora) {
+        alert('Título, fecha y hora son obligatorios');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/recordatorios/${recordatorioId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(recordatorioData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('✅ Recordatorio actualizado exitosamente');
+          window.location.href = "listaderecordatorios.html?actualizado=ok";
+        } else {
+          alert('Error al actualizar: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión con el servidor');
+      }
+    });
+
+    // Mostrar/ocultar días de la semana
+    repetirSelect.addEventListener("change", function () {
+      if (repetirSelect.value === "semanal") {
+        diasSemanaDiv.style.display = "block";
+      } else {
+        diasSemanaDiv.style.display = "none";
+      }
+    });
+
+    // Cancelar edición
+    function cancelarEdicion() {
+      if (confirm('¿Seguro que quieres cancelar? Los cambios no guardados se perderán.')) {
+        window.location.href = 'listaderecordatorios.html';
+      }
+    }
+
+    // Inicializar
+    document.addEventListener("DOMContentLoaded", cargarRecordatorio);
+  </script>
+</body>
+</html>

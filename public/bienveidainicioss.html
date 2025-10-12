@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bienvenida - REMEMBERSOON</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .bienvenida-container {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: #007BFF;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bienvenida-container">
+    <h1>¡Bienvenido/a, <span id="nombreCuidador"></span>!</h1>
+    <p>Gracias por usar REMEMBERSOON</p>
+    <button onclick="irAlPanel()">Ir al panel del cuidador</button>
+  </div>
+
+  <script>
+  // Recupera el usuario activo COMPLETO desde localStorage
+  const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+  
+  if (usuarioActivo && usuarioActivo.nombre) {
+    document.getElementById("nombreCuidador").textContent = usuarioActivo.nombre;
+    console.log('Usuario en bienvenida:', usuarioActivo);
+  } else {
+    document.getElementById("nombreCuidador").textContent = "Cuidador";
+    console.error('No hay usuario activo en sesión');
+  }
+
+  function irAlPanel() {
+    window.location.href = "Panelprueba.html";
+  }
+</script>
+
+</body>
+</html>

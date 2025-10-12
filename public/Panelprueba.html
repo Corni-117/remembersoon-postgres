@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel del Cuidador</title>
+  <!-- estilo de momento en esta parte porque me confundo con un solo estilo -->
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .panel {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .panel h2 {
+      color: #1e40af;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      min-width: 150px;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .buttons button {
+      background-color: #2563eb;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      width: 200px;
+    }
+
+    .buttons button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="panel">
+  <h2>Panel del Cuidador: <span id="nombreCuidador"></span></h2>
+  
+  <div>
+    <label for="paciente">Paciente:</label>
+    <select id="paciente">
+      <!-- Opciones se cargarán con JS -->
+    </select>
+  </div>
+
+  <div class="buttons">
+    <div class="row">
+      <button onclick="window.location.href='Agregarrecordatorioboton.html'">Agregar Recordatorio</button>
+      <button onclick="window.location.href='listaderecordatorios.html'">Lista de Recordatorios</button>
+    </div>
+    <button onclick="window.location.href='agregarnuevopaciente.html'">Agregar Paciente</button>
+  </div>
+  <!-- Agrega esto en el panel, antes del último </div> -->
+<button onclick="cerrarSesion()" style="
+  margin-top: 10px;
+  background-color: #dc2626;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+">
+  Cerrar Sesión
+</button>
+</div>
+  
+ <!-- <script>
+  // Detectar si viene de guardar recordatorio con parámetro de éxito
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("guardado") === "ok") {
+    alert("✅ Recordatorio guardado con éxito");
+  }
+</script>  -->
+
+<!-- Toast visual nuevo para mi, estudia mas funciones de esto
+<div id="toast" style="
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #22c55e;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 9999; ">
+  ✅ Recordatorio guardado con éxito
+</div>   -->
+
+<script>
+
+
+// Verificar que hay un usuario activo
+function verificarSesion() {
+  const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+  
+  if (!usuarioActivo || !usuarioActivo.id) {
+    alert('Debes iniciar sesión primero');
+    window.location.href = 'index.html';
+    return false;
+  }
+  
+  console.log('Usuario activo en panel:', usuarioActivo);
+  return true;
+}
+
+
+  // Cargar pacientes del cuidador
+  async function cargarPacientes() {
+    try {
+      const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (!usuarioActivo) {
+        console.error("No hay usuario activo en sesión.");
+        return;
+      }
+
+      const selectPaciente = document.getElementById("paciente");
+      const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
+      const data = await response.json();
+
+      if (data.success && data.pacientes.length > 0) {
+        selectPaciente.innerHTML = data.pacientes.map(p => 
+          `<option value="${p.id}">${p.nombre}</option>`
+        ).join('');
+      } else {
+        selectPaciente.innerHTML = '<option value="">No hay pacientes registrados</option>';
+      }
+    } catch (error) {
+      console.error("Error al cargar pacientes:", error);
+    }
+  }
+
+  // Mostrar nombre del cuidador
+  function mostrarNombreCuidador() {
+    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+    if (usuarioActivo && usuarioActivo.nombre) {
+      document.getElementById("nombreCuidador").textContent = usuarioActivo.nombre;
+    }
+  }
+
+  // Redirecciones actualizadas
+  function configurarBotones() {
+    document.querySelector('button[onclick*="Agregar Recordatorio"]').onclick = () => {
+      window.location.href = 'Agregarrecordatorioboton.html';
+    };
+    
+    document.querySelector('button[onclick*="Lista de Recordatorios"]').onclick = () => {
+      window.location.href = 'listaderecordatorios.html';
+    };
+    
+    document.querySelector('button[onclick*="Agregar Paciente"]').onclick = () => {
+      window.location.href = 'agregarnuevopaciente.html';
+    };
+  }
+
+  // Toast de notificación
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("guardado") === "ok") {
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+    setTimeout(() => {
+      toast.style.display = "none";
+      history.replaceState(null, "", window.location.pathname);
+    }, 3000);
+  }
+
+  // Inicializar
+document.addEventListener("DOMContentLoaded", () => {
+  if (!verificarSesion()) return; // 👈 VERIFICAR SESIÓN PRIMERO
+  
+  mostrarNombreCuidador();
+  cargarPacientes();
+  configurarBotones();
+});
+
+// Cerrar sesión
+function cerrarSesion() {
+  if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+    localStorage.removeItem('usuarioActivo');
+    localStorage.removeItem('nombreCuidador');
+    window.location.href = 'index.html';
+  }
+}
+
+// Verificar recordatorios próximos - VERSIÓN MEJORADA
+async function verificarRecordatoriosProximos() {
+  try {
+    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+    if (!usuarioActivo) {
+      console.log('❌ No hay usuario activo para notificaciones');
+      return;
+    }
+
+    console.log('🔍 Revisando recordatorios próximos...');
+    
+    const response = await fetch(`/api/recordatorios/cuidador/${usuarioActivo.id}`);
+    const data = await response.json();
+
+    if (data.success) {
+      const ahora = new Date();
+      console.log('🕐 Hora actual:', ahora.toLocaleTimeString());
+      
+      const recordatoriosHoy = data.recordatorios.filter(rec => {
+        const fechaRecordatorio = new Date(rec.fecha + 'T' + rec.hora);
+        const diferencia = fechaRecordatorio - ahora;
+        
+        console.log(`📅 ${rec.titulo}: ${rec.fecha} ${rec.hora} - Diferencia: ${diferencia}ms`);
+        
+        // Notificar si falta entre 1 minuto y 1 hora
+        return diferencia > 60000 && diferencia < 3600000; // 1 min a 1 hora
+      });
+
+      console.log(`✅ ${recordatoriosHoy.length} recordatorios próximos encontrados`);
+
+      recordatoriosHoy.forEach(rec => {
+        // Usar localStorage para evitar duplicados
+        const notificadoKey = `notificado_${rec.id}`;
+        if (!localStorage.getItem(notificadoKey)) {
+          const fechaRecordatorio = new Date(rec.fecha + 'T' + rec.hora);
+          const minutosRestantes = Math.round((fechaRecordatorio - ahora) / 60000);
+          
+          alert(`🔔 RECORDATORIO PRÓXIMO\n\n📝 ${rec.titulo}\n⏰ En ${minutosRestantes} minutos (${rec.hora})\n👤 Paciente: ${rec.paciente_nombre}\n🚨 Prioridad: ${rec.prioridad}`);
+          
+          // Marcar como notificado
+          localStorage.setItem(notificadoKey, 'true');
+        }
+      });
+    }
+  } catch (error) {
+    console.error('💥 Error en notificaciones:', error);
+  }
+}
+
+// Verificar cada 1 minuto (para pruebas) en lugar de 5 minutos
+setInterval(verificarRecordatoriosProximos, 60000);
+
+
+</script>
+
+
+
+</body>
+</html>
