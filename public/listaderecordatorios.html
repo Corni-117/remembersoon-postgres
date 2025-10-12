@@ -201,50 +201,33 @@
   }
 
   // Cargar recordatorios del cuidador
-  async function cargarRecordatorios(cuidadorId) {
-    try {
-      console.log('🔍 Cargando recordatorios para cuidador:', cuidadorId);
-      
-      // Usar el endpoint de debug para más información
-      const response = await fetch(`/api/debug/cuidador/${cuidadorId}/recordatorios`);
-      
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('📊 Debug data recibida:', data);
+  // Reemplaza tu función cargarRecordatorios con esta:
+async function cargarRecordatorios(cuidadorId) {
+  try {
+    console.log('🔍 Cargando recordatorios para cuidador:', cuidadorId);
 
-      recordatorios = data.recordatorios || [];
-      console.log(`✅ ${recordatorios.length} recordatorios cargados`);
+    // Esta es la URL correcta para la API
+    const response = await fetch(`/api/recordatorios/cuidador/${cuidadorId}`);
 
-      // Renderizar TODOS los recordatorios inicialmente
-      renderRecordatorios("todos");
-      
-    } catch (error) {
-      console.error('💥 Error cargando recordatorios:', error);
-      
-      // Fallback: intentar con el endpoint original
-      try {
-        const response = await fetch(`/api/recordatorios/cuidador/${cuidadorId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          recordatorios = data.recordatorios;
-          renderRecordatorios("todos");
-        }
-      } catch (fallbackError) {
-        listaContainer.innerHTML = `
-          <div style="text-align: center; color: #dc2626;">
-            <p>⚠️ Error cargando recordatorios</p>
-            <small>${error.message}</small>
-            <br>
-            <button onclick="location.reload()" style="margin-top: 10px; padding: 5px 10px;">Reintentar</button>
-          </div>
-        `;
-      }
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    if (data.success) {
+      recordatorios = data.recordatorios || [];
+      console.log('✅ Datos recibidos:', recordatorios); // Log para ver los datos
+      renderRecordatorios("todos");
+    } else {
+      throw new Error(data.message || 'La API no devolvió datos exitosos');
+    }
+
+  } catch (error) {
+    console.error('💥 Error cargando recordatorios:', error);
+    listaContainer.innerHTML = `<div style="text-align: center; color: #dc2626;"><p>⚠️ No se pudieron cargar los recordatorios.</p></div>`;
   }
+}
 
   // Mostrar recordatorios
   function renderRecordatorios(filtroPacienteId = "todos") {
