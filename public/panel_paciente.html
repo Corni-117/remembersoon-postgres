@@ -412,15 +412,19 @@
   }
 
   // Formatear fecha en español
-  function formatearFecha(fechaString) {
-    const fecha = new Date(fechaString + 'T00:00:00'); // Agregar tiempo para evitar problemas de zona horaria
-    return fecha.toLocaleDateString('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
+  function formatearFecha(fechaISO) {
+  // La base de datos devuelve una fecha en formato ISO (ej. ...T00:00:00.000Z)
+  // Simplemente la pasamos directamente al constructor de Date.
+  const fecha = new Date(fechaISO);
+
+  // El resto de la lógica para formatear en español está bien.
+  return fecha.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
   // Inicializar la página
   document.addEventListener('DOMContentLoaded', async function() {

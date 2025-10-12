@@ -253,7 +253,7 @@ async function cargarTodosLosRecordatorios() {
         <div style="flex: 1;">
           <strong>${rec.titulo}</strong><br>
           <small>${rec.descripcion || 'Sin descripción'}</small><br>
-          <small>📅 ${rec.fecha} ⏰ ${rec.hora}</small><br>
+          <small>📅 ${rec.fecha.split('T')[0]} ⏰ ${rec.hora}</small><br>
           <small>👤 ${rec.paciente_nombre} • 🚨 ${rec.prioridad}</small>
         </div>
         <button class="menu-btn">⋯</button>
