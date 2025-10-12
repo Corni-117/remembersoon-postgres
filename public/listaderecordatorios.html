@@ -192,25 +192,42 @@
   }
 
   // Carga TODOS los recordatorios del cuidador
-  async function cargarTodosLosRecordatorios() {
-    try {
-      const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-      if (!usuarioActivo || !usuarioActivo.id) throw new Error('No hay usuario activo');
+  // Reemplaza tu función cargarTodosLosRecordatorios con esta:
+async function cargarTodosLosRecordatorios() {
+  try {
+    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+    if (!usuarioActivo || !usuarioActivo.id) throw new Error('No hay usuario activo');
 
-      const response = await fetch(`/api/recordatorios/cuidador/${usuarioActivo.id}`);
-      const data = await response.json();
+    // 1. Primero, obtenemos la lista de todos tus pacientes
+    const pacientesResponse = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
+    const pacientesData = await pacientesResponse.json();
+    if (!pacientesData.success) throw new Error('No se pudieron obtener los pacientes');
+    
+    // 2. Creamos una lista de "promesas", una por cada paciente, para buscar sus recordatorios
+    const promesasDeRecordatorios = pacientesData.pacientes.map(paciente =>
+      fetch(`/api/recordatorios/paciente/${paciente.id}`).then(res => res.json())
+    );
 
-      if (data.success) {
-        recordatorios = data.recordatorios;
-        renderRecordatorios();
-      } else {
-        throw new Error('La API no devolvió datos exitosos');
+    // 3. Ejecutamos todas las búsquedas al mismo tiempo y esperamos los resultados
+    const resultados = await Promise.all(promesasDeRecordatorios);
+
+    // 4. Juntamos todos los recordatorios de todos los pacientes en un solo gran arreglo
+    let listaCompleta = [];
+    resultados.forEach(resultado => {
+      if (resultado.success && resultado.recordatorios) {
+        listaCompleta = listaCompleta.concat(resultado.recordatorios);
       }
-    } catch (error) {
-      console.error('💥 Error cargando recordatorios:', error);
-      listaContainer.innerHTML = `<p style="color: red; text-align: center;">Error al cargar recordatorios.</p>`;
-    }
+    });
+
+    recordatorios = listaCompleta; // Guardamos la lista completa
+    console.log('✅ Todos los recordatorios han sido cargados:', recordatorios);
+    renderRecordatorios(); // Ahora sí, renderizamos la lista completa
+
+  } catch (error) {
+    console.error('💥 Error cargando todos los recordatorios:', error);
+    listaContainer.innerHTML = `<p style="color: red; text-align: center;">Error al cargar recordatorios.</p>`;
   }
+}
 
   // Muestra los recordatorios en la pantalla, filtrando si es necesario
   function renderRecordatorios() {
