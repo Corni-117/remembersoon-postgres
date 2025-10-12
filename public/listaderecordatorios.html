@@ -167,6 +167,11 @@
   const listaContainer = document.getElementById("listaRecordatorios");
   const filtroPaciente = document.getElementById("filtroPaciente");
 
+  // --- FUNCIÓN FALTANTE (AÑADIDA DE NUEVO) ---
+  function volverAlPanel() {
+    window.location.href = "Panelprueba.html";
+  }
+
   // Función 1: Cargar los pacientes en el filtro
   async function cargarPacientes() {
     try {
@@ -178,10 +183,11 @@
       const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.pacientes) {
         filtroPaciente.innerHTML = '<option value="todos">Todos los pacientes</option>';
+        // CORRECCIÓN: Usar p._id para el valor de la opción
         data.pacientes.forEach(p => {
-          filtroPaciente.innerHTML += `<option value="${p.id}">${p.nombre}</option>`;
+          filtroPaciente.innerHTML += `<option value="${p._id}">${p.nombre}</option>`;
         });
       }
     } catch (error) {
@@ -197,14 +203,12 @@
         throw new Error('No hay usuario activo');
       }
 
-      console.log(`🔍 Cargando todos los recordatorios para cuidador: ${usuarioActivo.id}`);
       const response = await fetch(`/api/recordatorios/cuidador/${usuarioActivo.id}`);
       const data = await response.json();
 
       if (data.success) {
         recordatorios = data.recordatorios;
-        console.log('✅ Recordatorios recibidos:', recordatorios);
-        renderRecordatorios(); // Llama a renderizar sin filtro
+        renderRecordatorios(); 
       } else {
         throw new Error('La API no devolvió datos exitosos');
       }
@@ -219,9 +223,10 @@
     listaContainer.innerHTML = "";
     const filtro = filtroPaciente.value;
     
+    // CORRECCIÓN: Usar r.paciente_id._id para la comparación
     const recordatoriosFiltrados = (filtro === 'todos')
       ? recordatorios
-      : recordatorios.filter(r => r.paciente_id.id == filtro);
+      : recordatorios.filter(r => r.paciente_id && r.paciente_id._id == filtro);
 
     if (recordatoriosFiltrados.length === 0) {
       listaContainer.innerHTML = `<p style="text-align: center;">No hay recordatorios para mostrar.</p>`;
@@ -236,12 +241,14 @@
       div.innerHTML = `
         <div style="flex: 1;">
           <strong>${rec.titulo}</strong><br>
+          <small>${rec.descripcion || 'Sin descripción'}</small><br>
+          <small>📅 ${rec.fecha} ⏰ ${rec.hora}</small><br>
           <small>👤 ${paciente.nombre} • 🚨 ${rec.prioridad}</small>
         </div>
         <button class="menu-btn">⋯</button>
         <div class="menu-options">
-          <button onclick="window.location.href='editar_recordatorio.html?id=${rec.id}'">✏️ Editar</button>
-          <button onclick="eliminarRecordatorio('${rec.id}')">🗑️ Eliminar</button>
+          <button onclick="window.location.href='editar_recordatorio.html?id=${rec._id}'">✏️ Editar</button>
+          <button onclick="eliminarRecordatorio('${rec._id}')">🗑️ Eliminar</button>
         </div>
       `;
       listaContainer.appendChild(div);
@@ -250,28 +257,37 @@
     // Activar menús (este código no cambia)
     document.querySelectorAll(".menu-btn").forEach(btn => {
       btn.addEventListener("click", (e) => {
-        // ... (lógica del menú)
+        const menu = btn.nextElementSibling;
+        document.querySelectorAll(".menu-options").forEach(m => {
+          if (m !== menu) m.style.display = "none";
+        });
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+        e.stopPropagation();
       });
     });
   }
   
-  // Función 4: Eliminar un recordatorio (simplificada)
+  // Función 4: Eliminar un recordatorio
   async function eliminarRecordatorio(id) {
     if (!confirm("¿Estás seguro de eliminar este recordatorio?")) return;
     try {
-        await fetch(`/api/recordatorios/${id}`, { method: 'DELETE' });
-        alert('✅ Recordatorio eliminado');
-        cargarTodosLosRecordatorios(); // Recargar la lista
+        const response = await fetch(`/api/recordatorios/${id}`, { method: 'DELETE' });
+        const data = await response.json();
+        if (data.success) {
+            alert('✅ Recordatorio eliminado');
+            // Recargar la lista desde cero
+            await cargarTodosLosRecordatorios();
+        } else {
+            alert('❌ Error al eliminar');
+        }
     } catch (error) {
         alert('⚠️ Error de conexión al eliminar');
     }
   }
 
   // --- Event Listeners ---
-  // Cuando el filtro cambia, volver a renderizar
   filtroPaciente.addEventListener("change", renderRecordatorios);
 
-  // Al cargar la página, cargar todo
   document.addEventListener("DOMContentLoaded", async () => {
     await cargarPacientes();
     await cargarTodosLosRecordatorios();
