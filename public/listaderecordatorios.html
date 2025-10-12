@@ -167,27 +167,23 @@
   const listaContainer = document.getElementById("listaRecordatorios");
   const filtroPaciente = document.getElementById("filtroPaciente");
 
-  // --- FUNCIÓN FALTANTE (AÑADIDA DE NUEVO) ---
   function volverAlPanel() {
     window.location.href = "Panelprueba.html";
   }
 
-  // Función 1: Cargar los pacientes en el filtro
+  // Carga los pacientes en el menú desplegable del filtro
   async function cargarPacientes() {
     try {
       const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-      if (!usuarioActivo || !usuarioActivo.id) {
-        throw new Error('No hay usuario activo');
-      }
+      if (!usuarioActivo || !usuarioActivo.id) throw new Error('No hay usuario activo');
       
       const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
       const data = await response.json();
 
       if (data.success && data.pacientes) {
         filtroPaciente.innerHTML = '<option value="todos">Todos los pacientes</option>';
-        // CORRECCIÓN: Usar p._id para el valor de la opción
         data.pacientes.forEach(p => {
-          filtroPaciente.innerHTML += `<option value="${p._id}">${p.nombre}</option>`;
+          filtroPaciente.innerHTML += `<option value="${p.id}">${p.nombre}</option>`;
         });
       }
     } catch (error) {
@@ -195,20 +191,18 @@
     }
   }
 
-  // Función 2: Cargar TODOS los recordatorios del cuidador
+  // Carga TODOS los recordatorios del cuidador
   async function cargarTodosLosRecordatorios() {
     try {
       const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-      if (!usuarioActivo || !usuarioActivo.id) {
-        throw new Error('No hay usuario activo');
-      }
+      if (!usuarioActivo || !usuarioActivo.id) throw new Error('No hay usuario activo');
 
       const response = await fetch(`/api/recordatorios/cuidador/${usuarioActivo.id}`);
       const data = await response.json();
 
       if (data.success) {
         recordatorios = data.recordatorios;
-        renderRecordatorios(); 
+        renderRecordatorios();
       } else {
         throw new Error('La API no devolvió datos exitosos');
       }
@@ -218,43 +212,43 @@
     }
   }
 
-  // Función 3: Mostrar los recordatorios en la pantalla
+  // Muestra los recordatorios en la pantalla, filtrando si es necesario
   function renderRecordatorios() {
     listaContainer.innerHTML = "";
     const filtro = filtroPaciente.value;
     
-    // CORRECCIÓN: Usar r.paciente_id._id para la comparación
+    // --- LÓGICA DE FILTRADO CORREGIDA PARA POSTGRESQL ---
     const recordatoriosFiltrados = (filtro === 'todos')
       ? recordatorios
-      : recordatorios.filter(r => r.paciente_id && r.paciente_id._id == filtro);
+      : recordatorios.filter(r => r.paciente_id == filtro);
 
     if (recordatoriosFiltrados.length === 0) {
-      listaContainer.innerHTML = `<p style="text-align: center;">No hay recordatorios para mostrar.</p>`;
+      listaContainer.innerHTML = `<p style="text-align: center; margin-top: 20px;">No hay recordatorios para mostrar.</p>`;
       return;
     }
 
     recordatoriosFiltrados.forEach(rec => {
-      const paciente = rec.paciente_id || { nombre: 'N/A', color_hex: '#ccc' };
       const div = document.createElement("div");
       div.className = "recordatorio";
-      div.style.backgroundColor = paciente.color_hex;
+      // --- LÓGICA DE VISUALIZACIÓN CORREGIDA PARA POSTGRESQL ---
+      div.style.backgroundColor = rec.color_hex || '#f0f0f0';
       div.innerHTML = `
         <div style="flex: 1;">
           <strong>${rec.titulo}</strong><br>
           <small>${rec.descripcion || 'Sin descripción'}</small><br>
           <small>📅 ${rec.fecha} ⏰ ${rec.hora}</small><br>
-          <small>👤 ${paciente.nombre} • 🚨 ${rec.prioridad}</small>
+          <small>👤 ${rec.paciente_nombre} • 🚨 ${rec.prioridad}</small>
         </div>
         <button class="menu-btn">⋯</button>
         <div class="menu-options">
-          <button onclick="window.location.href='editar_recordatorio.html?id=${rec._id}'">✏️ Editar</button>
-          <button onclick="eliminarRecordatorio('${rec._id}')">🗑️ Eliminar</button>
+          <button onclick="window.location.href='editar_recordatorio.html?id=${rec.id}'">✏️ Editar</button>
+          <button onclick="eliminarRecordatorio(${rec.id})">🗑️ Eliminar</button>
         </div>
       `;
       listaContainer.appendChild(div);
     });
 
-    // Activar menús (este código no cambia)
+    // Activar menús desplegables
     document.querySelectorAll(".menu-btn").forEach(btn => {
       btn.addEventListener("click", (e) => {
         const menu = btn.nextElementSibling;
@@ -267,7 +261,7 @@
     });
   }
   
-  // Función 4: Eliminar un recordatorio
+  // Eliminar un recordatorio
   async function eliminarRecordatorio(id) {
     if (!confirm("¿Estás seguro de eliminar este recordatorio?")) return;
     try {
@@ -275,8 +269,7 @@
         const data = await response.json();
         if (data.success) {
             alert('✅ Recordatorio eliminado');
-            // Recargar la lista desde cero
-            await cargarTodosLosRecordatorios();
+            await cargarTodosLosRecordatorios(); // Recargar la lista
         } else {
             alert('❌ Error al eliminar');
         }
