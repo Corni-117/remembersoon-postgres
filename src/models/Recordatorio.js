@@ -89,6 +89,20 @@ class Recordatorio {
   return result.rows[0];
  }
   
+// Dentro de la clase Recordatorio, en el archivo Recordatorio.js
+
+// AÑADE ESTA NUEVA FUNCIÓN ESTÁTICA
+static async obtenerProximos(pacienteId, fecha, hora) {
+    const query = `
+      SELECT titulo, descripcion FROM recordatorios
+      WHERE paciente_id = $1 AND fecha = $2 AND hora LIKE $3
+    `;
+    // Usamos LIKE para que '14:30' coincida con '14:30:00'
+    const result = await pool.query(query, [pacienteId, fecha, `${hora}%`]);
+    return result.rows;
+}
+
+
 }
 
 module.exports = Recordatorio;
