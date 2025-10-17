@@ -183,7 +183,7 @@ router.get('/:id', async (req, res) => {
 router.get('/proximos/:pacienteId', async (req, res) => {
   try {
     const { pacienteId } = req.params;
-    // La lógica compleja ahora está en el modelo, haciendo esto más limpio
+    // La lógica compleja ahora está en el modelo, haciendo la ruta más simple.
     const recordatorios = await Recordatorio.obtenerProximos(pacienteId);
     res.json({ success: true, recordatorios });
   } catch (error) {

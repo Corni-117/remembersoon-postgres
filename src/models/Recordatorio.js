@@ -95,8 +95,8 @@ class Recordatorio {
 // src/models/Recordatorio.js
 
 static async obtenerProximos(pacienteId) {
-  // Esta consulta combina fecha y hora, y busca si el recordatorio
-  // ocurrió en cualquier momento del último minuto en el servidor.
+  // Esta consulta busca cualquier recordatorio cuya fecha y hora
+  // combinadas caigan en cualquier momento del último minuto en el servidor.
   const query = `
     SELECT titulo, descripcion FROM recordatorios
     WHERE 
