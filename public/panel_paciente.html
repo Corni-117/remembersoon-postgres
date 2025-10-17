@@ -411,13 +411,16 @@
     }
   }
 
-  // Formatear fecha en español
-  function formatearFecha(fechaISO) {
-  // La base de datos devuelve una fecha en formato ISO (ej. ...T00:00:00.000Z)
-  // Simplemente la pasamos directamente al constructor de Date.
-  const fecha = new Date(fechaISO);
+// Reemplaza tu función formatearFecha en panel_paciente.html
+function formatearFecha(fechaISO) {
+  // fechaISO viene como '2025-10-16T00:00:00.000Z'
+  const datePart = fechaISO.split('T')[0]; // Extraemos solo '2025-10-16'
+  const parts = datePart.split('-'); // Obtenemos ['2025', '10', '16']
 
-  // El resto de la lógica para formatear en español está bien.
+  // Creamos la fecha usando las partes, forzando la zona horaria local.
+  // El mes es 0-indexado en JS, por eso restamos 1.
+  const fecha = new Date(parts[0], parts[1] - 1, parts[2]);
+
   return fecha.toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',

@@ -178,23 +178,14 @@ router.get('/:id', async (req, res) => {
 // AÑADE ESTA NUEVA RUTA
 // GET /api/recordatorios/proximos/:pacienteId
 // Busca recordatorios para un paciente que ocurran en el minuto actual.
+// src/routes/recordatorios.js
+
 router.get('/proximos/:pacienteId', async (req, res) => {
   try {
     const { pacienteId } = req.params;
-    const ahora = new Date();
-
-    // Formatear la fecha y hora actual para que coincida con la base de datos
-    const fechaHoy = ahora.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-    const horaActual = ahora.toTimeString().split(' ')[0].substring(0, 5); // 'HH:MM'
-
-    // Llama al modelo para buscar en la base de datos
-    // (Asumimos que tienes una función en tu modelo para esto)
-    const recordatorios = await Recordatorio.obtenerProximos(pacienteId, fechaHoy, horaActual);
-
-    res.json({
-      success: true,
-      recordatorios: recordatorios
-    });
+    // La lógica compleja ahora está en el modelo, haciendo esto más limpio
+    const recordatorios = await Recordatorio.obtenerProximos(pacienteId);
+    res.json({ success: true, recordatorios });
   } catch (error) {
     console.error('Error buscando recordatorios próximos:', error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
