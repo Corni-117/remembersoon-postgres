@@ -95,13 +95,14 @@ class Recordatorio {
 // src/models/Recordatorio.js
 
 static async obtenerProximos(pacienteId) {
-  // Esta consulta busca cualquier recordatorio cuya fecha y hora
-  // combinadas caigan en cualquier momento del último minuto en el servidor.
+  // Esta consulta es la más robusta. Le dice a la base de datos
+  // que convierta la hora actual a la zona horaria de la Ciudad de México ('America/Mexico_City')
+  // antes de buscar en el último minuto.
   const query = `
     SELECT titulo, descripcion FROM recordatorios
     WHERE 
       paciente_id = $1 AND
-      (fecha + hora) BETWEEN NOW() - interval '1 minute' AND NOW()
+      (fecha + hora) BETWEEN (NOW() AT TIME ZONE 'America/Mexico_City') - interval '1 minute' AND (NOW() AT TIME ZONE 'America/Mexico_City')
   `;
   const result = await pool.query(query, [pacienteId]);
   return result.rows;
