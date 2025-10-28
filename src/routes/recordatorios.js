@@ -175,7 +175,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// AÑADE ESTA NUEVA RUTA
+
 // GET /api/recordatorios/proximos/:pacienteId
 // Busca recordatorios para un paciente que ocurran en el minuto actual.
 // src/routes/recordatorios.js

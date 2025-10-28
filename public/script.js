@@ -47,14 +47,14 @@ async function iniciarSesion() {
     const data = await response.json();
 
     if (data.success) {
-  // ✅ LIMPIAR datos antiguos antes de guardar los nuevos
+  //  LIMPIAR datos antiguos antes de guardar los nuevos
   localStorage.removeItem('nombreCuidador');
   localStorage.removeItem('usuarioActivo');
   
   alert(`¡Bienvenido/a, ${data.user.nombre}!`);
   localStorage.setItem('usuarioActivo', JSON.stringify(data.user));
   cerrarModales();
-  window.location.href = "bienveidainicioss.html";
+  window.location.href = "bienvenida.html";
 }
 	else {
       alert(data.message || "Error en el login");
@@ -89,7 +89,7 @@ async function accesoPaciente() {
     const data = await response.json();
 
     if (data.success) {
-  // ✅ LIMPIAR sesión de cuidador si existe
+  //  LIMPIAR sesión de cuidador si existe
   localStorage.removeItem('nombreCuidador'); 
   localStorage.removeItem('usuarioActivo');
   
@@ -214,12 +214,12 @@ if (document.getElementById("formRegistroCuidador")) {
 
 if (document.getElementById("btnContinuar")) {
   document.getElementById("btnContinuar").addEventListener("click", function () {
-    window.location.href = "bienvenida.html";
+    window.location.href = "bienveidainicioss.html"; 
   });
 }
 
 // =============================================
-// CÓDIGO VIEJO (COMENTADO - PARA REFERENCIA)
+// CÓDIGO VIEJO 
 // =============================================
 
 /*

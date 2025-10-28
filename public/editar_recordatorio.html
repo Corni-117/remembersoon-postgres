@@ -258,7 +258,7 @@
         const data = await response.json();
 
         if (data.success) {
-          alert('✅ Recordatorio actualizado exitosamente');
+          alert(' Recordatorio actualizado exitosamente');
           window.location.href = "listaderecordatorios.html?actualizado=ok";
         } else {
           alert('Error al actualizar: ' + data.message);
