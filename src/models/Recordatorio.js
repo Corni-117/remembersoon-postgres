@@ -3,16 +3,16 @@ const pool = require('../database/db');
 class Recordatorio {
   // Crear nuevo recordatorio
   static async crear(recordatorioData) {
-    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id } = recordatorioData;
+    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana } = recordatorioData;
     
     try {
       const query = `
-        INSERT INTO recordatorios (titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO recordatorios (titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
       `;
       
-      const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id];
+      const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana];
       const result = await pool.query(query, values);
       
       return result.rows[0];
@@ -97,7 +97,7 @@ static async obtenerProximos(pacienteId) {
   // que coincidan con la hora actual, sin importar la fecha.
   // También trae la fecha y el tipo de repetición para que la Raspberry Pi pueda decidir.
   const query = `
-    SELECT titulo, descripcion, fecha, repetir
+    SELECT titulo, descripcion, fecha, repetir, dias_semana 
     FROM recordatorios
     WHERE 
       paciente_id = $1 AND

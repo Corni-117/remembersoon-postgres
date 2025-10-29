@@ -200,6 +200,16 @@ document.getElementById("formRecordatorio").addEventListener("submit", async fun
     return;
   }
 
+// --- LÓGICA NUEVA PARA RECOLECTAR DÍAS ---
+  let diasSeleccionados = null;
+  if (document.getElementById("repetir").value === 'semanal') {
+      const checkboxes = document.querySelectorAll('#diasSemana input[type="checkbox"]:checked');
+      // Convertimos los nombres de los días a números (0=Domingo, 1=Lunes...)
+      const diasMap = { "Domingo": 0, "Lunes": 1, "Martes": 2, "Miércoles": 3, "Jueves": 4, "Viernes": 5, "Sábado": 6 };
+      diasSeleccionados = Array.from(checkboxes).map(cb => diasMap[cb.value]).join(',');
+  }
+  // -----------------------------------------
+
   const recordatorioData = {
     titulo: document.getElementById("titulo").value.trim(),
     descripcion: document.getElementById("descripcion").value.trim(),
@@ -207,7 +217,8 @@ document.getElementById("formRecordatorio").addEventListener("submit", async fun
     hora: document.getElementById("hora").value,
     repetir: document.getElementById("repetir").value,
     prioridad: document.getElementById("prioridad").value,
-    paciente_id: parseInt(pacienteId)  //  Ahora sí usa el ID real
+    paciente_id: parseInt(pacienteId),  //  Ahora sí usa el ID real
+    dias_semana: diasSeleccionados // <-- ENVIAMOS LOS DÍAS SELECCIONADOS
   };
 
   // Validaciones

@@ -70,6 +70,8 @@ CREATE INDEX IF NOT EXISTS idx_recordatorios_prioridad ON recordatorios(priorida
 -- Índices para CONTACTOS_EMERGENCIA
 CREATE INDEX IF NOT EXISTS idx_contactos_paciente ON contactos_emergencia(paciente_id);
 
+ALTER TABLE recordatorios ADD COLUMN dias_semana TEXT;
+
 -- =============================================
 -- MENSAJE DE CONFIRMACIÓN
 -- =============================================
