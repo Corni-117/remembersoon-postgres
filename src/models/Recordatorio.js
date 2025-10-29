@@ -91,30 +91,15 @@ class Recordatorio {
   
 // Esta consulta es más inteligente y maneja los 3 tipos de recordatorios.
   // DOW = Day of Week (Día de la Semana en PostgreSQL, donde 0=Domingo, 1=Lunes, etc.)
-static async obtenerProximos(pacienteId) {
   
+static async obtenerProximos(pacienteId) {
+  // Esta es la consulta que ya funcionaba, forzando la zona horaria.
+  // Solo buscará recordatorios de una sola vez por ahora para esta prueba.
   const query = `
-    WITH current_time AS (
-      SELECT NOW() AT TIME ZONE 'America/Mexico_City' AS now_mexico
-    )
-    SELECT r.titulo, r.descripcion
-    FROM recordatorios r, current_time ct
-    WHERE
-      r.paciente_id = $1
-      -- Condición 1: La HORA siempre debe coincidir (dentro del último minuto)
-      AND r.hora BETWEEN (ct.now_mexico - interval '1 minute')::time AND ct.now_mexico::time
-      -- Condición 2: Ahora revisamos la FECHA según el tipo de repetición
-      AND (
-        -- Para recordatorios de 'una_vez', la fecha debe ser hoy.
-        (r.repetir = 'una_vez' AND r.fecha = ct.now_mexico::date)
-        OR
-        -- Para recordatorios 'diarios', la fecha de inicio debe ser hoy o antes.
-        (r.repetir = 'diario' AND r.fecha <= ct.now_mexico::date)
-        OR
-        -- Para recordatorios 'semanales', la fecha de inicio debe ser hoy o antes
-        -- Y el día de la semana debe coincidir.
-        (r.repetir = 'semanal' AND r.fecha <= ct.now_mexico::date AND EXTRACT(DOW FROM r.fecha) = EXTRACT(DOW FROM ct.now_mexico))
-      )
+    SELECT titulo, descripcion FROM recordatorios
+    WHERE 
+      paciente_id = $1 AND
+      (fecha + hora) BETWEEN (NOW() AT TIME ZONE 'America/Mexico_City') - interval '1 minute' AND (NOW() AT TIME ZONE 'America/Mexico_City')
   `;
   const result = await pool.query(query, [pacienteId]);
   return result.rows;
