@@ -52,7 +52,7 @@ router.get('/paciente/:pacienteId', async (req, res) => {
 // Crear nuevo recordatorio
 router.post('/', async (req, res) => {
   try {
-    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id } = req.body;
+    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana } = req.body;
 
     // Validaciones básicas
     if (!titulo || !fecha || !hora || !paciente_id) {
@@ -69,7 +69,8 @@ router.post('/', async (req, res) => {
       hora,
       repetir: repetir || 'una_vez',
       prioridad: prioridad || 'media',
-      paciente_id
+      paciente_id,
+      dias_semana // ¡CORRECCIÓN! Ahora sí pasamos el valor al objeto
     };
 
     const recordatorio = await Recordatorio.crear(recordatorioData);
