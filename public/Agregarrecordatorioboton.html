@@ -161,7 +161,7 @@
           }
 
           // Usamos la ruta del backend para obtener los pacientes de este cuidador
-          const response = await fetch(`/api/pacientes/cuidador/${usuarioActivo.id}`);
+          const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
           const data = await response.json();
 
           if (data.success && data.pacientes.length > 0) {
