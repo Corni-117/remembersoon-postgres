@@ -2,24 +2,26 @@ const pool = require('../database/db');
 
 class Recordatorio {
   // Crear nuevo recordatorio
-  static async crear(recordatorioData) {
-    const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana } = recordatorioData;
-    
-    try {
-      const query = `
-        INSERT INTO recordatorios (titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING *
-      `;
-      
-      const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana];
-      const result = await pool.query(query, values);
-      
-      return result.rows[0];
-    } catch (error) {
-      throw error;
-    }
+
+static async crear(recordatorioData) {
+  // Nos aseguramos de incluir 'dias_semana' en la lista
+  const { titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana } = recordatorioData;
+
+  const query = `
+    INSERT INTO recordatorios (titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING *
+  `;
+  // Pasamos 'dias_semana' como el octavo valor
+  const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana];
+
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    throw error;
   }
+}
 
   // Obtener recordatorios por paciente
   static async obtenerPorPaciente(pacienteId) {
