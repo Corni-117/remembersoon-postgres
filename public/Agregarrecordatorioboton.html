@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Agregar Recordatorio</title>
-  <!-- estilo de momento en esta parte porque me confundo con un solo estilo -->
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f1f5f9;
       padding: 20px;
     }
-
     .container {
       max-width: 600px;
       margin: auto;
@@ -20,19 +18,16 @@
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
-
     h2 {
       color: #1e40af;
       text-align: center;
       margin-bottom: 25px;
     }
-
     label {
       display: block;
       margin-top: 15px;
       font-weight: bold;
     }
-
     input, select, textarea {
       width: 100%;
       padding: 10px;
@@ -41,7 +36,6 @@
       border-radius: 8px;
       font-size: 14px;
     }
-
     button {
       margin-top: 25px;
       width: 100%;
@@ -53,29 +47,28 @@
       border-radius: 8px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #1d4ed8;
     }
-
-    .dias-semana {
-      display: none;
-      margin-top: 10px;
-    }
-
-    .dias-semana label {
-      font-weight: normal;
-      margin-right: 10px;
-    }
-
-    .color-preview {
-      width: 40px;
-      height: 40px;
+    /* Contenedor para los días de la semana */
+    #dias-semana-container {
+      display: none; /* Inicia oculto */
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      border: 1px solid #ccc;
+    }
+    /* Estilo para los checkboxes y sus etiquetas */
+    .form-check {
       display: inline-block;
-      vertical-align: middle;
-      margin-left: 10px;
+      margin-right: 15px;
+    }
+    .form-check input {
+      width: auto;
+      margin-right: 5px;
+    }
+    .form-check label {
+      font-weight: normal;
     }
   </style>
 </head>
@@ -89,38 +82,48 @@
       <input type="text" id="titulo" required>
 
       <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" rows="3" required></textarea>
+      <textarea id="descripcion" rows="3"></textarea>
 
-      <label for="fecha">Fecha:</label>
+      <label for="fecha">Fecha de inicio:</label>
       <input type="date" id="fecha" required>
 
       <label for="hora">Hora:</label>
       <input type="time" id="hora" required>
 
       <label for="repetir">Repetir:</label>
-	  
       <select id="repetir">
-  <option value="una_vez">Una sola vez</option>
-  <option value="diario">Diariamente</option>
-  <option value="semanal">Semanalmente</option>
-</select>
-
-      <div id="diasSemana" class="dias-semana">
-        <label><input type="checkbox" value="Lunes"> Lunes</label>
-        <label><input type="checkbox" value="Martes"> Martes</label>
-        <label><input type="checkbox" value="Miércoles"> Miércoles</label>
-        <label><input type="checkbox" value="Jueves"> Jueves</label>
-        <label><input type="checkbox" value="Viernes"> Viernes</label>
-        <label><input type="checkbox" value="Sábado"> Sábado</label>
-        <label><input type="checkbox" value="Domingo"> Domingo</label>
-      </div>
-
-      <label for="paciente">Paciente:</label>
-      <select id="paciente">
-        <option value="uwu">uwu</option>
-        <option value="paciente1">Paciente 1</option>
-        <option value="paciente2">Paciente 2</option>
+        <option value="una_vez">Una sola vez</option>
+        <option value="diario">Diariamente</option>
+        <option value="semanal">Semanalmente</option>
       </select>
+
+      <div id="dias-semana-container">
+        <label>¿Qué días sonará?</label>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="0"><label>D</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="1"><label>L</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="2"><label>M</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="3"><label>M</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="4"><label>J</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="5"><label>V</label>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" name="dias_semana" value="6"><label>S</label>
+        </div>
+      </div>
+      <label for="paciente">Paciente:</label>
+      <select id="paciente" required>
+        </select>
 
       <label for="prioridad">Prioridad:</label>
       <select id="prioridad">
@@ -129,259 +132,115 @@
         <option value="alta">Alta</option>
       </select>
 
-      
-
       <button type="submit">Guardar Recordatorio</button>
     </form>
   </div>
   
   <script>
-  const repetirSelect = document.getElementById("repetir");
-  const diasSemanaDiv = document.getElementById("diasSemana");
-  const selectPaciente = document.getElementById("paciente");
+    document.addEventListener("DOMContentLoaded", () => {
+      const selectRepetir = document.getElementById("repetir");
+      const diasSemanaContainer = document.getElementById("dias-semana-container");
+      const selectPaciente = document.getElementById("paciente");
+      const formRecordatorio = document.getElementById("formRecordatorio");
 
-  // Cargar pacientes del cuidador
-async function cargarPacientes() {
-  try {
-    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-    
-    if (!usuarioActivo || !usuarioActivo.id) {
-      console.error('No hay usuario activo');
-      alert('Debes iniciar sesión primero');
-      window.location.href = 'index.html';
-      return;
-    }
-
-    const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
-    const data = await response.json();
-
-    if (data.success && data.pacientes.length > 0) {
-      selectPaciente.innerHTML = data.pacientes.map(paciente => 
-        `<option value="${paciente.id}">${paciente.nombre}</option>`
-      ).join('');
-    } else {
-      selectPaciente.innerHTML = '<option value="">No hay pacientes registrados</option>';
-      alert('No tienes pacientes registrados. Agrega un paciente primero.');
-    }
-
-  } catch (error) {
-    console.error('Error cargando pacientes:', error);
-    selectPaciente.innerHTML = '<option value="">Error cargando pacientes</option>';
-  }
-}
-
-  // Mostrar/ocultar días de la semana
-  repetirSelect.addEventListener("change", function () {
-    if (repetirSelect.value === "semanal") {
-      diasSemanaDiv.style.display = "block";
-    } else {
-      diasSemanaDiv.style.display = "none";
-    }
-  });
-
-  // Guardar recordatorio
-// Reemplaza esta función en Agregarrecordatorioboton.html
-document.getElementById("formRecordatorio").addEventListener("submit", async function (e) {
-  e.preventDefault();
-
-  const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-  if (!usuarioActivo || !usuarioActivo.id) {
-      alert('Debes iniciar sesión para agregar recordatorios');
-      return;
-  }
-
-  const pacienteSelect = document.getElementById("paciente");
-  const pacienteIdSeleccionado = pacienteSelect.value;
-  if (!pacienteIdSeleccionado) {
-      alert('Debes seleccionar un paciente.');
-      return;
-  }
-
-  // Lógica para recolectar los días de la semana
-  let diasSeleccionados = null;
-  if (document.getElementById("repetir").value === 'semanal') {
-      const checkboxes = document.querySelectorAll('#diasSemana input[type="checkbox"]:checked');
-      // Mapa para convertir el nombre del día a su número (0=Domingo, 1=Lunes, etc.)
-      const diasMap = { "Domingo": 0, "Lunes": 1, "Martes": 2, "Miércoles": 3, "Jueves": 4, "Viernes": 5, "Sábado": 6 };
-      // Creamos el texto "1,3,5"
-      diasSeleccionados = Array.from(checkboxes).map(cb => diasMap[cb.value]).join(',');
-  }
-
-  const recordatorioData = {
-    titulo: document.getElementById("titulo").value.trim(),
-    descripcion: document.getElementById("descripcion").value.trim(),
-    fecha: document.getElementById("fecha").value,
-    hora: document.getElementById("hora").value,
-    repetir: document.getElementById("repetir").value,
-    prioridad: document.getElementById("prioridad").value,
-    paciente_id: pacienteIdSeleccionado,
-    dias_semana: diasSeleccionados // Aquí enviamos el texto "1,3,5" o null
-  };
-
-  try {
-      const response = await fetch('/api/recordatorios', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(recordatorioData)
+      // --- 1. LÓGICA PARA MOSTRAR/OCULTAR LOS DÍAS ---
+      selectRepetir.addEventListener("change", () => {
+        if (selectRepetir.value === "semanal") {
+          diasSemanaContainer.style.display = "block";
+        } else {
+          diasSemanaContainer.style.display = "none";
+        }
       });
-      const data = await response.json();
-      if (data.success) {
-          alert('✅ Recordatorio guardado exitosamente');
-          window.location.href = "Panelprueba.html";
-      } else {
-          alert('Error al guardar: ' + data.message);
+
+      // --- 2. FUNCIÓN PARA CARGAR PACIENTES ---
+      async function cargarPacientes() {
+        try {
+          const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+          if (!usuarioActivo || !usuarioActivo.id) {
+            throw new Error('No hay un cuidador activo en la sesión.');
+          }
+
+          // Usamos la ruta del backend para obtener los pacientes de este cuidador
+          const response = await fetch(`/api/pacientes/cuidador/${usuarioActivo.id}`);
+          const data = await response.json();
+
+          if (data.success && data.pacientes.length > 0) {
+            selectPaciente.innerHTML = data.pacientes.map(paciente => 
+              `<option value="${paciente.id}">${paciente.nombre}</option>`
+            ).join('');
+          } else {
+            selectPaciente.innerHTML = '<option value="">No tienes pacientes</option>';
+            alert('No tienes pacientes registrados. Por favor, agrega un paciente primero desde el panel.');
+          }
+        } catch (error) {
+          console.error('Error cargando pacientes:', error);
+          alert(error.message);
+          window.location.href = 'Panelprueba.html';
+        }
       }
-  } catch (error) {
-      console.error('Error:', error);
-      alert('Error de conexión con el servidor');
-  }
-});
+      
+      // --- 3. LÓGICA PARA ENVIAR EL FORMULARIO (CORREGIDA) ---
+      formRecordatorio.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-  // Inicializar
-  document.addEventListener("DOMContentLoaded", cargarPacientes);
-</script>
-  
+        const pacienteIdSeleccionado = selectPaciente.value;
+        if (!pacienteIdSeleccionado) {
+          alert('Debes seleccionar un paciente.');
+          return;
+        }
 
-    <!-- <script>
-  // Obtener elementos del DOM
-  const form = document.getElementById("formRecordatorio");
-  
-  
-  
-  // Al inicio del <script>, después de obtener el formulario:
-const params = new URLSearchParams(window.location.search);
-const idRecordatorioEditar = params.get("editar");
+        const recordatorioData = {
+          titulo: document.getElementById("titulo").value.trim(),
+          descripcion: document.getElementById("descripcion").value.trim(),
+          fecha: document.getElementById("fecha").value,
+          hora: document.getElementById("hora").value,
+          repetir: document.getElementById("repetir").value,
+          prioridad: document.getElementById("prioridad").value,
+          paciente_id: parseInt(pacienteIdSeleccionado),
+          dias_semana: null // Valor por defecto
+        };
+        
+        // --- ¡AQUÍ ESTÁ LA MAGIA! ---
+        // Si es semanal, recolectamos los días seleccionados
+        if (recordatorioData.repetir === 'semanal') {
+          const diasSeleccionados = [];
+          document.querySelectorAll('input[name="dias_semana"]:checked').forEach(checkbox => {
+            diasSeleccionados.push(checkbox.value);
+          });
 
-// Precargar datos si estamos en modo edición
-if (idRecordatorioEditar) {
-  const recordatorios = JSON.parse(localStorage.getItem("recordatorios")) || [];
-  const recordatorio = recordatorios.find(r => r.id == idRecordatorioEditar);
-  
-  if (recordatorio) {
-    document.getElementById("titulo").value = recordatorio.titulo;
-    document.getElementById("descripcion").value = recordatorio.descripcion;
-    document.getElementById("fecha").value = recordatorio.fecha;
-    document.getElementById("hora").value = recordatorio.hora;
-    document.getElementById("repetir").value = recordatorio.repetir;
-    document.getElementById("paciente").value = recordatorio.paciente;
-    document.getElementById("prioridad").value = recordatorio.prioridad;
+          if (diasSeleccionados.length === 0) {
+            alert('Si el recordatorio es semanal, debes seleccionar al menos un día.');
+            return; // Detenemos el envío
+          }
+          // Convertimos el array [1, 3, 5] a un string "1,3,5"
+          recordatorioData.dias_semana = diasSeleccionados.join(',');
+        }
+        
+        console.log("Enviando al backend:", recordatorioData);
 
-    // Marcar checkboxes de días si es semanal
-    if (recordatorio.repetir === "semanal") {
-      diasSemanaDiv.style.display = "block";
-      recordatorio.diasSemana.forEach(dia => {
-        const checkbox = document.querySelector(`#diasSemana input[value="${dia}"]`);
-        if (checkbox) checkbox.checked = true;
+        // --- LÓGICA DE ENVÍO AL BACKEND ---
+        try {
+          const response = await fetch('/api/recordatorios', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recordatorioData)
+          });
+          const data = await response.json();
+          if (data.success) {
+            alert('✅ Recordatorio guardado exitosamente');
+            window.location.href = "Panelprueba.html";
+          } else {
+            alert('Error al guardar: ' + (data.message || 'Error desconocido'));
+          }
+        } catch (error) {
+          console.error('Error de red:', error);
+          alert('Error de conexión con el servidor. Inténtalo de nuevo.');
+        }
       });
-    }
-  }
-}
 
-// Modificar el submit para actualizar en lugar de crear
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-  
-  const recordatorios = JSON.parse(localStorage.getItem("recordatorios")) || [];
-  const datosFormulario = {
-    id: idRecordatorioEditar || Date.now(), // Mantener ID si es edición
-    // ... (resto de campos como antes)
-  };
-
-  if (idRecordatorioEditar) {
-    // Actualizar recordatorio existente
-    const index = recordatorios.findIndex(r => r.id == idRecordatorioEditar);
-    if (index !== -1) recordatorios[index] = datosFormulario;
-  } else {
-    // Crear nuevo
-    recordatorios.push(datosFormulario);
-  }
-
-  localStorage.setItem("recordatorios", JSON.stringify(recordatorios));
-  window.location.href = "Panelprueba.html?guardado=ok";
-});
-  
-  
-  
-  const selectPaciente = document.getElementById("paciente");
-  const diasSemanaDiv = document.getElementById("diasSemana");
-
-  // Cargar pacientes asociados al cuidador activo
-  function cargarPacientes() {
-    const usuarioActivo = JSON.parse(localStorage.getItem("usuarioActivo"));
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
-    
-    const pacientes = usuarios.filter(u => 
-      u.tipo === "paciente" && u.cuidadorEmail === usuarioActivo?.email
-    );
-
-    selectPaciente.innerHTML = pacientes.map(p => 
-      `<option value="${p.nombre}">${p.nombre}</option>`
-    ).join("");
-  }
-
-  // Mostrar/ocultar días de la semana al seleccionar "Semanalmente"
-  document.getElementById("repetir").addEventListener("change", function() {
-    diasSemanaDiv.style.display = this.value === "semanal" ? "block" : "none";
-  });
-
-  // Guardar recordatorio
-  form.addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    // Obtener datos del formulario
-    const recordatorio = {
-      id: Date.now(), // ID único basado en timestamp
-      titulo: document.getElementById("titulo").value.trim(),
-      descripcion: document.getElementById("descripcion").value.trim(),
-      fecha: document.getElementById("fecha").value,
-      hora: document.getElementById("hora").value,
-      repetir: document.getElementById("repetir").value,
-      diasSemana: document.getElementById("repetir").value === "semanal" 
-        ? Array.from(document.querySelectorAll('#diasSemana input[type="checkbox"]:checked')).map(cb => cb.value)
-        : [],
-      paciente: document.getElementById("paciente").value,   // posibre causante de undefined 
-      prioridad: document.getElementById("prioridad").value,
-      cuidadorEmail: JSON.parse(localStorage.getItem("usuarioActivo"))?.email // Asociar al cuidador
-    };
-
-    // Guardar en localStorage
-    let recordatorios = JSON.parse(localStorage.getItem("recordatorios")) || [];
-    recordatorios.push(recordatorio);
-    localStorage.setItem("recordatorios", JSON.stringify(recordatorios));
-
-    // Redirigir con confirmación
-    window.location.href = "Panelprueba.html?guardado=ok";   // checa esto 
-  });
-
-  // Inicializar al cargar la página
-  document.addEventListener("DOMContentLoaded", cargarPacientes);
-  
-  function validarFormulario() {
-  const titulo = document.getElementById("titulo").value.trim();
-  const fecha = document.getElementById("fecha").value;
-  const hoy = new Date().toISOString().split("T")[0];
-
-  if (!titulo) {
-    alert("¡El título es obligatorio!");
-    return false;
-  }
-
-  if (fecha < hoy) {
-    alert("¡La fecha no puede ser pasada!");
-    return false;
-  }
-
-  return true;
-}
-
-// Modificar el event listener del formulario:
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-  if (!validarFormulario()) return;
-  // ... resto del código de guardado
-});
-  
-</script> -->
-
+      // --- INICIALIZAR LA PÁGINA ---
+      cargarPacientes();
+    });
+  </script>
 </body>
 </html>
