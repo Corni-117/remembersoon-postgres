@@ -51,16 +51,16 @@ static async crear(recordatorioData) {
 
   // Actualizar recordatorio
   static async actualizar(id, recordatorioData) {
-    const { titulo, descripcion, fecha, hora, repetir, prioridad } = recordatorioData;
+    const { titulo, descripcion, fecha, hora, repetir, prioridad, dias_semana } = recordatorioData;
     
     const query = `
       UPDATE recordatorios 
-      SET titulo = $1, descripcion = $2, fecha = $3, hora = $4, repetir = $5, prioridad = $6
-      WHERE id = $7
+      SET titulo = $1, descripcion = $2, fecha = $3, hora = $4, repetir = $5, prioridad = $6, dias_semana = $7
+      WHERE id = $8 
       RETURNING *
     `;
     
-    const values = [titulo, descripcion, fecha, hora, repetir, prioridad, id];
+    const values = [titulo, descripcion, fecha, hora, repetir, prioridad, dias_semana, id];
     const result = await pool.query(query, values);
     return result.rows[0];
   }

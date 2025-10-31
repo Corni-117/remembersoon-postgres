@@ -90,7 +90,6 @@
 <body>
   <div class="container">
     <h2>Editar Recordatorio</h2>
-    
     <div id="loading" class="loading">Cargando recordatorio...</div>
     
     <form id="formRecordatorio" style="display: none;">
@@ -114,19 +113,18 @@
       </select>
 
       <div id="diasSemana" class="dias-semana">
-        <label><input type="checkbox" value="Lunes"> Lunes</label>
-        <label><input type="checkbox" value="Martes"> Martes</label>
-        <label><input type="checkbox" value="Miércoles"> Miércoles</label>
-        <label><input type="checkbox" value="Jueves"> Jueves</label>
-        <label><input type="checkbox" value="Viernes"> Viernes</label>
-        <label><input type="checkbox" value="Sábado"> Sábado</label>
-        <label><input type="checkbox" value="Domingo"> Domingo</label>
+        <label>¿Qué días sonará?</label><br>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="0"><label>D</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="1"><label>L</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="2"><label>M</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="3"><label>M</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="4"><label>J</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="5"><label>V</label></div>
+        <div class="form-check"><input type="checkbox" name="dias_semana" value="6"><label>S</label></div>
       </div>
 
       <label for="paciente">Paciente:</label>
-      <select id="paciente" required>
-        <!-- Se llenará dinámicamente -->
-      </select>
+      <select id="paciente" required disabled> </select>
 
       <label for="prioridad">Prioridad:</label>
       <select id="prioridad">
@@ -143,34 +141,27 @@
   </div>
 
   <script>
+    // Tu script original, con las correcciones integradas
     let recordatorioId = null;
     const repetirSelect = document.getElementById("repetir");
     const diasSemanaDiv = document.getElementById("diasSemana");
 
-    // Obtener ID del recordatorio de la URL
     function obtenerIdDeURL() {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get('id');
     }
 
-    // Cargar datos del recordatorio
     async function cargarRecordatorio() {
       recordatorioId = obtenerIdDeURL();
-      
       if (!recordatorioId) {
         alert('ID de recordatorio no especificado');
         window.location.href = 'listaderecordatorios.html';
         return;
       }
-
       try {
-        // Cargar pacientes primero
         await cargarPacientes();
-        
-        // Cargar datos del recordatorio
         const response = await fetch(`/api/recordatorios/${recordatorioId}`);
         const data = await response.json();
-
         if (data.success) {
           llenarFormulario(data.recordatorio);
         } else {
@@ -183,50 +174,47 @@
       }
     }
 
-    // Cargar pacientes del cuidador
     async function cargarPacientes() {
       try {
         const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-        
-        if (!usuarioActivo || !usuarioActivo.id) {
-          throw new Error('Debes iniciar sesión primero');
-        }
-
+        if (!usuarioActivo?.id) throw new Error('Debes iniciar sesión primero');
         const response = await fetch(`/api/auth/pacientes/${usuarioActivo.id}`);
         const data = await response.json();
-
         if (data.success) {
           const selectPaciente = document.getElementById("paciente");
-          selectPaciente.innerHTML = data.pacientes.map(paciente => 
-            `<option value="${paciente.id}">${paciente.nombre}</option>`
-          ).join('');
+          selectPaciente.innerHTML = data.pacientes.map(paciente => `<option value="${paciente.id}">${paciente.nombre}</option>`).join('');
         }
       } catch (error) {
         console.error('Error cargando pacientes:', error);
       }
     }
 
-    // Llenar formulario con datos del recordatorio
     function llenarFormulario(recordatorio) {
       document.getElementById("titulo").value = recordatorio.titulo;
       document.getElementById("descripcion").value = recordatorio.descripcion || '';
-      document.getElementById("fecha").value = recordatorio.fecha;
+      // ===== CAMBIO 2: CORRECCIÓN DEL FORMATO DE FECHA =====
+      document.getElementById("fecha").value = recordatorio.fecha.split('T')[0];
       document.getElementById("hora").value = recordatorio.hora;
       document.getElementById("repetir").value = recordatorio.repetir;
       document.getElementById("paciente").value = recordatorio.paciente_id;
       document.getElementById("prioridad").value = recordatorio.prioridad;
 
-      // Mostrar/ocultar días de la semana
       if (recordatorio.repetir === 'semanal') {
         diasSemanaDiv.style.display = 'block';
+        // ===== CAMBIO 3: MARCAR LOS CHECKBOXES GUARDADOS =====
+        if (recordatorio.dias_semana) {
+          const diasGuardados = recordatorio.dias_semana.split(','); // ["1", "3", "5"]
+          diasGuardados.forEach(dia => {
+            const checkbox = document.querySelector(`input[name="dias_semana"][value="${dia}"]`);
+            if (checkbox) checkbox.checked = true;
+          });
+        }
       }
 
-      // Ocultar loading y mostrar formulario
       document.getElementById("loading").style.display = 'none';
       document.getElementById("formRecordatorio").style.display = 'block';
     }
 
-    // Guardar cambios
     document.getElementById("formRecordatorio").addEventListener("submit", async function(e) {
       e.preventDefault();
 
@@ -237,28 +225,29 @@
         hora: document.getElementById("hora").value,
         repetir: document.getElementById("repetir").value,
         prioridad: document.getElementById("prioridad").value,
-        paciente_id: parseInt(document.getElementById("paciente").value)
+        paciente_id: parseInt(document.getElementById("paciente").value),
+        // ===== CAMBIO 4: AÑADIR 'dias_semana' AL OBJETO A ENVIAR =====
+        dias_semana: null // Valor por defecto
       };
 
-      // Validaciones
-      if (!recordatorioData.titulo || !recordatorioData.fecha || !recordatorioData.hora) {
-        alert('Título, fecha y hora son obligatorios');
-        return;
+      // ===== CAMBIO 5: RECOLECTAR LOS DÍAS DE LA SEMANA AL GUARDAR =====
+      if (recordatorioData.repetir === 'semanal') {
+        const diasSeleccionados = Array.from(document.querySelectorAll('input[name="dias_semana"]:checked')).map(cb => cb.value);
+        if (diasSeleccionados.length === 0) {
+            return alert('Debes seleccionar al menos un día para un recordatorio semanal.');
+        }
+        recordatorioData.dias_semana = diasSeleccionados.join(',');
       }
 
       try {
         const response = await fetch(`/api/recordatorios/${recordatorioId}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(recordatorioData)
         });
-
         const data = await response.json();
-
         if (data.success) {
-          alert(' Recordatorio actualizado exitosamente');
+          alert('Recordatorio actualizado exitosamente');
           window.location.href = "listaderecordatorios.html?actualizado=ok";
         } else {
           alert('Error al actualizar: ' + data.message);
@@ -269,23 +258,16 @@
       }
     });
 
-    // Mostrar/ocultar días de la semana
     repetirSelect.addEventListener("change", function () {
-      if (repetirSelect.value === "semanal") {
-        diasSemanaDiv.style.display = "block";
-      } else {
-        diasSemanaDiv.style.display = "none";
-      }
+      diasSemanaDiv.style.display = (this.value === "semanal") ? "block" : "none";
     });
 
-    // Cancelar edición
     function cancelarEdicion() {
       if (confirm('¿Seguro que quieres cancelar? Los cambios no guardados se perderán.')) {
         window.location.href = 'listaderecordatorios.html';
       }
     }
 
-    // Inicializar
     document.addEventListener("DOMContentLoaded", cargarRecordatorio);
   </script>
 </body>
