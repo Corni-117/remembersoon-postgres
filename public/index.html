@@ -2,22 +2,153 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>REMEMBERSOON</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-a:#0b1220; --bg-b:#0e1324;
+      --panel-a:rgba(255,255,255,.08); --panel-b:rgba(255,255,255,.04);
+      --text:#eaf0ff; --muted:#b8c2d9;
+      --primary-a:#60a5fa; --primary-b:#2563eb;
+      --border:rgba(255,255,255,.12); --shadow:0 18px 45px rgba(0,0,0,.35);
+      --radius:18px;
+      --input-bg: rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #1b2a4a 0%, transparent 60%),
+        radial-gradient(1000px 700px at 80% 90%, #0e856a33 0%, transparent 60%),
+        linear-gradient(160deg, var(--bg-a) 0%, var(--bg-b) 100%);
+      display:flex; flex-direction:column; min-height:100%;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:5;
+      display:grid; grid-template-columns:120px 1fr 120px; align-items:center;
+      gap:12px;
+      padding:10px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      border-bottom:1px solid var(--border);
+      backdrop-filter:saturate(130%) blur(6px);
+    }
+    .brand{
+      text-align:center; font-weight:800; letter-spacing:.5px;
+      font-size:clamp(18px, 2.8vw, 24px);
+      color:#9cc3ff;
+    }
+    .hlogo{
+      height:64px; width:auto; object-fit:contain; display:block;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
+      transition:.2s transform;
+    }
+    .hlogo:hover{ transform:scale(1.04) }
+
+    /* Contenido */
+    .page{ flex:1; display:grid; place-items:center; padding:24px; }
+    .card{
+      background:linear-gradient(180deg, var(--panel-a), var(--panel-b));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      width:min(92vw, 560px);
+      padding:40px;
+      text-align:center;
+      backdrop-filter:saturate(135%) blur(10px);
+    }
+    .avatar{
+      width:64px; height:64px; margin:0 auto 16px; border-radius:14px;
+      display:grid; place-items:center; font-weight:800; color:#061021;
+      background:linear-gradient(135deg, var(--primary-a), var(--primary-b));
+      box-shadow:0 8px 20px rgba(37,99,235,.35);
+    }
+    h1{margin:0 0 6px; font-size:clamp(26px,3.2vw,36px); font-weight:800}
+    p.lead{margin:0 0 26px; color:var(--muted)}
+    .actions{display:grid; gap:12px}
+    .btn{width:100%; padding:14px; border-radius:12px; font-weight:700; cursor:pointer; border:0; transition:.2s}
+    .btn-primary{background:linear-gradient(180deg,var(--primary-a),var(--primary-b)); color:#f8fafc; box-shadow:0 6px 18px rgba(37,99,235,.35)}
+    .btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(37,99,235,.45)}
+    .btn-ghost{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.18)}
+    .btn-ghost:hover{background:rgba(255,255,255,.05); transform:translateY(-1px)}
+
+    /* ===== Modales (estética a juego) ===== */
+    .modal{
+      display:none; position:fixed; inset:0; z-index:50;
+      background:rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+    }
+    .modal-content{
+      background: linear-gradient(180deg, var(--panel-a), var(--panel-b));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      width:min(92vw,520px);
+      margin:6% auto; padding:26px;
+      color:var(--text);
+      position:relative;
+    }
+    .modal-content h2{ margin:0 0 12px; font-weight:800 }
+    .modal-content input{
+      width:100%; padding:12px; margin:10px 0 14px;
+      border-radius:12px; border:1px solid rgba(255,255,255,.18);
+      background:var(--input-bg); color:var(--text); outline:none;
+    }
+    .modal-content input::placeholder{ color: rgba(234,240,255,.7) }
+    .modal-content .close{
+      position:absolute; right:16px; top:10px; font-size:22px; cursor:pointer; color:#b8c2d9;
+    }
+    .modal-content .close:hover{ color:#9cc3ff }
+    .modal-content button{
+      width:100%; padding:12px; border-radius:12px; border:0; font-weight:700;
+      background: linear-gradient(180deg, var(--primary-a), var(--primary-b));
+      color:#f8fafc; box-shadow:0 6px 18px rgba(37,99,235,.35);
+      transition:.2s;
+    }
+    .modal-content button:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(37,99,235,.45) }
+
+    /* Responsive */
+    @media (max-width:820px){
+      .site-header{grid-template-columns:96px 1fr 96px}
+      .hlogo{height:52px}
+    }
+    @media (max-width:540px){
+      .site-header{grid-template-columns:64px 1fr 64px; padding:8px 12px}
+      .hlogo{height:42px}
+      .brand{font-size:18px}
+      .card{padding:28px}
+    }
+  </style>
 </head>
 <body>
-  <div class="card">
-    <h1>REMEMBERSOON 111</h1>
-    <p>Tu asistente para el cuidado de personas con Alzheimer</p>
-    <div class="buttons">
-      <button onclick="mostrarLogin()">Iniciar Sesión</button>
-      <button onclick="mostrarRegistro()">Registrarse</button>
-      <button onclick="mostrarAccesoPaciente()">Acceso Paciente</button>
-    </div>
-  </div>
+  <!-- Header con logos -->
+  <header class="site-header">
+    <img src="Esime.png" alt="ESIME" class="hlogo" />
+    <div class="brand">Página web Remembersoon</div>
+    <img src="Poli.png" alt="IPN" class="hlogo" style="justify-self:end" />
+  </header>
 
-  <div class="modal" id="modalLogin">
+  <!-- Contenido -->
+  <main class="page">
+    <section class="card">
+      <div class="avatar">RS</div>
+      <h1>REMEMBERSOON 111</h1>
+      <p class="lead">Tu asistente para el cuidado de personas con Alzheimer</p>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="mostrarLogin()">Iniciar Sesión</button>
+        <button class="btn btn-ghost" onclick="mostrarRegistro()">Registrarse</button>
+        <button class="btn btn-ghost" onclick="mostrarAccesoPaciente()">Acceso Paciente</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== MODAL: Login ===== -->
+  <div class="modal" id="modalLogin" aria-hidden="true">
     <div class="modal-content">
       <span class="close" onclick="cerrarModales()">&times;</span>
       <h2>Iniciar Sesión</h2>
@@ -27,24 +158,54 @@
     </div>
   </div>
 
-  <div class="modal" id="modalRegistro">
+  <!-- ===== MODAL: Registro ===== -->
+  <div class="modal" id="modalRegistro" aria-hidden="true">
     <div class="modal-content">
       <span class="close" onclick="cerrarModales()">&times;</span>
       <iframe src="registro_cuidador.html" width="100%" height="600px" style="border:none;"></iframe>
     </div>
   </div>
 
-  <div class="modal" id="modalPaciente">
+  <!-- ===== MODAL: Acceso Paciente ===== -->
+  <div class="modal" id="modalPaciente" aria-hidden="true">
     <div class="modal-content">
       <span class="close" onclick="cerrarModales()">&times;</span>
       <h2>Acceso Paciente</h2>
       <input type="text" placeholder="Ingresa tu código" id="codigoPacienteInput">
       <button onclick="accesoPaciente()">Acceder</button>
     </div>
-  </div> 
+  </div>
 
-	
+	<script src="script.js"></script>
+  <script>
+    // Funciones originales del 4.html preservadas
+    function mostrarLogin() {
+      document.getElementById('modalLogin').style.display = 'block';
+    }
 
-  <script src="script.js"></script>
+    function mostrarRegistro() {
+      document.getElementById('modalRegistro').style.display = 'block';
+    }
+
+    function mostrarAccesoPaciente() {
+      document.getElementById('modalPaciente').style.display = 'block';
+    }
+
+    function cerrarModales() {
+      document.getElementById('modalLogin').style.display = 'none';
+      document.getElementById('modalRegistro').style.display = 'none';
+      document.getElementById('modalPaciente').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic fuera del contenido
+    window.onclick = function(event) {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      });
+    }
+  </script>
 </body>
 </html>

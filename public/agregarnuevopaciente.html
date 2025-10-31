@@ -1,232 +1,241 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Agregar Paciente</title>
+  <title>REMEMBERSOON · Agregar Paciente</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-   body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f9fc;
-      padding: 20px;
+    :root {
+      --bg: #0b1220;
+      --surface: rgba(255,255,255,0.08);
+      --surface-strong: rgba(255,255,255,0.12);
+      --text: #eaf0ff;
+      --muted: #b8c2d9;
+      --primary: #6ea8fe;
+      --primary-strong: #3b82f6;
+      --accent: #22d3ee;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
     }
 
-    h1 {
-      text-align: center;
-      color: #333;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #1b2a4a 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 90%, #0e856a33 0%, transparent 60%),
+                  linear-gradient(160deg, #0b1220 0%, #0e1324 100%);
+      display:grid; place-items:center; padding:24px;
     }
 
-    .alerta {
-      background-color: #d9edf7;
-      color: #31708f;
-      border: 1px solid #bce8f1;
-      padding: 10px;
-      margin-bottom: 20px;
-      text-align: center;
+    .wrap{width:min(980px,100%)}
+    .card{
+      backdrop-filter:saturate(135%) blur(8px);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
     }
 
-    form {
-      max-width: 700px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    .header{
+      display:flex; align-items:center; gap:14px; margin-bottom:14px;
     }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
+    .logo{
+      width:52px; height:52px; border-radius:14px; display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--primary-strong), var(--accent));
+      box-shadow:0 8px 20px rgba(59,130,246,.35);
+      font-weight:800; color:#0b1220; letter-spacing:.5px;
     }
+    h1{margin:0; font-size:clamp(22px,3vw,28px); font-weight:800}
+    h3{margin:20px 0 10px; font-weight:600; color:var(--muted); font-size:18px}
+    .sub{color:var(--muted); margin:2px 0 10px}
 
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+    form{display:grid; gap:14px;}
+
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    @media (max-width:820px){ .grid{grid-template-columns:1fr} }
+
+    label{font-size:14px; color:var(--muted); display:block; margin-top:15px; font-weight:bold;}
+    .field{display:grid; gap:6px}
+    input[type="text"], input[type="date"], input[type="tel"], input[type="color"], select, textarea{
+      width:100%; padding:12px; border-radius:12px; background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.16); color:var(--text); outline:none;
     }
+    textarea{min-height:90px; resize:vertical}
 
-    .fila-contacto {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
+    .row{display:flex; gap:10px}
+    .row > *{flex:1}
+
+    .color-preview{width:44px; height:44px; border-radius:10px; border:1px solid rgba(255,255,255,.2)}
+
+    .btn{
+      appearance:none; border:0; border-radius:14px; padding:12px 16px; font-weight:600; cursor:pointer;
+      transition:transform .08s ease, box-shadow .2s ease, background .2s ease; line-height:1; user-select:none;
     }
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{ background:linear-gradient(180deg,var(--primary),var(--primary-strong)); color:#061021; box-shadow:0 6px 18px rgba(62,126,247,.35); }
+    .btn-ok{ background: linear-gradient(180deg, #34d399, var(--ok)); color: #052113; }
 
-    .fila-contacto input {
-      flex: 1;
-    }
+    .notice{display:none; border:1px solid rgba(34,197,94,.35); background:rgba(16,185,129,.12); color:#d1fae5; padding:12px; border-radius:12px}
+    .notice.error{border-color:rgba(239,68,68,.45); background:rgba(239,68,68,.12); color:#fee2e2}
 
-    .color-picker-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .color-preview {
-      width: 40px;
-      height: 40px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 10px;
-      background-color: #007BFF;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .codigo-generado {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #e6ffe6;
-      color: #2e7d32;
-      border: 1px solid #b2dfdb;
-      border-radius: 5px;
-      text-align: center;
+    .codigo-generado{
+      margin-top:20px;
+      padding:12px;
+      border:1px dashed rgba(255,255,255,.2);
+      color:#bbf7d0;
+      background:rgba(34,197,94,.08);
+      border-radius:12px;
+      text-align:center;
+      display:none;
     }
 
     #btnContinuar {
       display: none;
       margin-top: 15px;
-      background-color: #28a745;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    
-    <form id="formPaciente">
-      <h1>Agregar Paciente</h1>
-	  <h3>Datos del Paciente</h3>
-    <label for="nombrePaciente">Nombre del paciente:</label>
-    <input type="text" id="nombrePaciente" required>
+  <main class="wrap">
+    <section class="card">
+      <div class="header">
+        <div class="logo">RS</div>
+        <div>
+          <h1>Agregar Paciente</h1>
+          <p class="sub">Captura los datos básicos y genera un código de acceso para su interfaz simplificada.</p>
+        </div>
+      </div>
 
-    <label for="fechaNacPaciente">Fecha de nacimiento:</label>
-    <input type="date" id="fechaNacPaciente" required>
+      <form id="formPaciente" novalidate>
+        <h3>Datos del Paciente</h3>
+        
+        <div class="grid">
+          <div class="field">
+            <label for="nombrePaciente">Nombre del paciente</label>
+            <input type="text" id="nombrePaciente" required placeholder="Ej. María López" />
+          </div>
+          <div class="field">
+            <label for="fechaNacPaciente">Fecha de nacimiento</label>
+            <input type="date" id="fechaNacPaciente" required />
+          </div>
+        </div>
 
-    <label for="condicionesMedicas">Condiciones médicas:</label>
-    <textarea id="condicionesMedicas" rows="3" required></textarea>
+        <div class="field">
+          <label for="condicionesMedicas">Condiciones médicas</label>
+          <textarea id="condicionesMedicas" required placeholder="Ej. Hipertensión, alergia a penicilina…"></textarea>
+        </div>
 
-    <label for="nivelDemencia">Nivel de demencia:</label>
-    <select id="nivelDemencia" required>
-      <option value="">Seleccione una opción</option>
-      <option value="leve">Demencia leve</option>
-      <option value="moderada">Demencia moderada</option>
-      <option value="severa">Demencia severa</option>
-      <option value="otra">Otra</option>
-    </select>
+        <div class="grid">
+          <div class="field">
+            <label for="nivelDemencia">Nivel de demencia</label>
+            <select id="nivelDemencia" required>
+              <option value="">Seleccione una opción</option>
+              <option value="leve">Demencia leve</option>
+              <option value="moderada">Demencia moderada</option>
+              <option value="severa">Demencia severa</option>
+              <option value="otra">Otra</option>
+            </select>
+          </div>
 
-    <label>Contactos de emergencia:</label>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
+          <div class="field">
+            <label for="colorPaciente">Color de identificación</label>
+            <div class="row">
+              <input type="color" id="colorPaciente" value="#4f46e5" />
+              <div id="colorPreview" class="color-preview" aria-label="Vista previa de color"></div>
+            </div>
+          </div>
+        </div>
 
-    <label>Color para identificar al paciente:</label>
-    <div class="color-picker-container">
-      <input type="color" id="colorPaciente" required>
-      <div id="colorPreview" class="color-preview"></div>
-    </div>
+        <div class="field">
+          <label>Contactos de emergencia</label>
+          <div class="row"><input type="tel" placeholder="Número (10 dígitos)" pattern="[0-9]{10}"><input type="text" placeholder="Nombre del contacto"></div>
+          <div class="row"><input type="tel" placeholder="Número (10 dígitos)" pattern="[0-9]{10}"><input type="text" placeholder="Nombre del contacto"></div>
+          <div class="row"><input type="tel" placeholder="Número (10 dígitos)" pattern="[0-9]{10}"><input type="text" placeholder="Nombre del contacto"></div>
+        </div>
 
-    <button type="submit">Guardar</button>
-	
-	
+        <div id="msg" class="notice"></div>
+        <div id="msgErr" class="notice error"></div>
 
-    <div id="codigoPaciente" class="codigo-generado" style="display: none;"></div>
-    <button id="btnContinuar" type="button">Continuar</button>
-	  
-    </form>
-  </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+
+        <div id="codigoPaciente" class="codigo-generado"></div>
+        <button id="btnContinuar" type="button" class="btn btn-ok" style="display:none">Continuar</button>
+      </form>
+    </section>
+  </main>
 
   <script>
-  const colorInput = document.getElementById("colorPaciente");
-  const colorPreview = document.getElementById("colorPreview");
-
-  colorInput.addEventListener("input", function () {
+    // Vista previa de color
+    const colorInput = document.getElementById('colorPaciente');
+    const colorPreview = document.getElementById('colorPreview');
     colorPreview.style.backgroundColor = colorInput.value;
-  });
+    colorInput.addEventListener('input', () => colorPreview.style.backgroundColor = colorInput.value);
 
-  document.getElementById("formPaciente").addEventListener("submit", async function(event) {
-    event.preventDefault();
-    
-    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-    
-    if (!usuarioActivo || !usuarioActivo.id) {
-      alert('Debes iniciar sesión primero');
-      window.location.href = 'index.html';
-      return;
-    }
+    const msg = document.getElementById('msg');
+    const msgErr = document.getElementById('msgErr');
 
-    const nivel = document.getElementById("nivelDemencia").value;
-    if (nivel !== "leve") {
-      if (!confirm("La plataforma está dirigida a pacientes con demencia leve. ¿Deseas continuar de todos modos?")) {
+    function showMsg(text){ msg.textContent = text; msg.style.display = 'block'; msgErr.style.display = 'none'; }
+    function showErr(text){ msgErr.textContent = text; msgErr.style.display = 'block'; msg.style.display = 'none'; }
+
+    document.getElementById('formPaciente').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+      if (!usuarioActivo || !usuarioActivo.id) {
+        alert('Debes iniciar sesión primero');
+        window.location.href = 'index.html';
         return;
       }
-    }
 
-    const pacienteData = {
-      nombre: document.getElementById("nombrePaciente").value.trim(),
-      fecha_nacimiento: document.getElementById("fechaNacPaciente").value,
-      condiciones_medicas: document.getElementById("condicionesMedicas").value.trim(),
-      nivel_demencia: nivel,
-      color_hex: document.getElementById("colorPaciente").value,
-      cuidador_id: usuarioActivo.id
-    };
-
-    try {
-      const response = await fetch('/api/pacientes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(pacienteData)
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        const divCodigo = document.getElementById("codigoPaciente");
-        divCodigo.style.display = "block";
-        divCodigo.textContent = "Código generado para el paciente: " + data.codigoPaciente;
-
-        document.getElementById("btnContinuar").style.display = "block";
-        
-        alert('✅ Paciente agregado exitosamente');
-      } else {
-        alert("Error en el registro: " + data.message);
+      const nivel = document.getElementById('nivelDemencia').value;
+      if (nivel !== 'leve') {
+        const ok = confirm('La plataforma está dirigida a pacientes con demencia leve. ¿Deseas continuar de todos modos?');
+        if (!ok) return;
       }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error de conexión con el servidor');
-    }
-  });
 
-  document.getElementById("btnContinuar").addEventListener("click", function () {
-    window.location.href = "Panelprueba.html";
-  });
-</script>
+      const pacienteData = {
+        nombre: document.getElementById('nombrePaciente').value.trim(),
+        fecha_nacimiento: document.getElementById('fechaNacPaciente').value,
+        condiciones_medicas: document.getElementById('condicionesMedicas').value.trim(),
+        nivel_demencia: nivel,
+        color_hex: document.getElementById('colorPaciente').value,
+        cuidador_id: usuarioActivo.id
+      };
+
+      try {
+        const response = await fetch('/api/pacientes', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pacienteData)
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          showMsg('Paciente agregado correctamente.');
+          const divCodigo = document.getElementById('codigoPaciente');
+          divCodigo.style.display = 'block';
+          divCodigo.textContent = 'Código generado para el paciente: ' + data.codigoPaciente;
+          document.getElementById('btnContinuar').style.display = 'inline-block';
+          alert('Paciente agregado exitosamente');
+        } else {
+          showErr('Error en el registro: ' + (data.message || 'Desconocido'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showErr('Error de conexión con el servidor');
+      }
+    });
+
+    document.getElementById('btnContinuar').addEventListener('click', () => {
+      window.location.href = 'Panelprueba.html';
+    });
+  </script>
 </body>
 </html>
-
-		

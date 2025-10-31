@@ -1,188 +1,287 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Registro de Cuidador - REMEMBERSOON</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f9fc;
-      padding: 20px;
+    /* ===== Layout de página (fondo y centrado) ===== */
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      padding:40px 16px;
+      background: radial-gradient(1200px 800px at 20% 10%, #1b2a4a 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 90%, #0e856a33 0%, transparent 60%),
+                  linear-gradient(160deg, #0b1220 0%, #0e1324 100%);
+      color-scheme: dark;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: #eaf0ff;
     }
 
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
-    .alerta {
-      background-color: #d9edf7;
-      color: #31708f;
-      border: 1px solid #bce8f1;
-      padding: 10px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    form {
-      max-width: 700px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
+    /* ===== Tarjeta principal ===== */
+    .card-form{
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      max-width: 700px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+      backdrop-filter: saturate(135%) blur(10px);
+      padding: 28px;
     }
 
+    .card-form h1{
+      margin:0 0 8px;
+      text-align:center;
+      font-weight: 800;
+      color:#6ea8fe;
+      font-size: clamp(22px, 3vw, 28px);
+    }
+    .badge-top{
+      text-align:center;
+      color:#b8c2d9;
+      margin-bottom: 20px;
+      font-size: 14px;
+      background: rgba(255,255,255,.08);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    /* ===== Secciones ===== */
+    .section{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:20px;
+      margin-top:18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    }
+    .section h3{
+      margin:0 0 16px;
+      color:#6ea8fe;
+      font-size:18px;
+      text-align:center;
+      font-weight:800;
+    }
+
+    /* ===== Grid de campos ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
+    @media (max-width: 780px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    /* ===== Campos ===== */
+    label{
+      display:block;
+      font-weight:600;
+      margin-top: 15px;
+      margin-bottom:6px;
+      color:#eaf0ff;
+      font-size:14px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="date"],
+    textarea,
+    select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color:#eaf0ff;
+      outline:none;
+      font: inherit;
+      -webkit-appearance:none;
+      appearance:none;
+      box-shadow: inset 0 0 0 9999px rgba(255,255,255,0);
+    }
+    textarea{ 
+      min-height: 90px; 
+      resize: vertical; 
+    }
+
+    input::placeholder, textarea::placeholder{
+      color: rgba(234,240,255,.70);
+    }
+
+    input:focus, textarea:focus, select:focus{
+      border-color: rgba(96,165,250,.55);
+      box-shadow: 0 0 0 3px rgba(96,165,250,.18);
+    }
+
+    /* Select desplegable oscuro */
+    select{
+      color-scheme: dark;
+    }
+    select option{
+      background:#111a2b;
+      color:#eaf0ff;
+    }
+
+    /* Picker de color + preview */
+    .color-picker-container{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .color-preview{
+      width:40px;
+      height:40px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,.24);
+      background:#222b45;
+    }
+
+    /* Filas de contacto */
     .fila-contacto {
       display: flex;
       gap: 10px;
       margin-top: 10px;
     }
-
     .fila-contacto input {
       flex: 1;
     }
 
-    .color-picker-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .color-preview {
-      width: 40px;
-      height: 40px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 10px;
-      background-color: #007BFF;
-      color: white;
+    /* Botón principal */
+    button{
+      margin-top:20px;
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      font-weight:700;
+      color:#061021;
+      background: linear-gradient(180deg, #60a5fa, #2563eb);
+      box-shadow: 0 8px 20px rgba(37,99,235,.35);
+      cursor:pointer;
+      transition: transform .15s ease, box-shadow .2s ease;
       font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    }
+    button:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(37,99,235,.45);
     }
 
-    button:hover {
-      background-color: #0056b3;
+    /* Código generado + continuar */
+    .codigo-generado{
+      display:none;
+      margin-top:20px;
+      padding:12px;
+      text-align:center;
+      border-radius:10px;
+      border:1px solid rgba(34,197,94,.35);
+      background: linear-gradient(180deg, rgba(34,197,94,.18), rgba(34,197,94,.08));
+      color:#d1fae5;
+      font-weight:600;
     }
-
-    .codigo-generado {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #e6ffe6;
-      color: #2e7d32;
-      border: 1px solid #b2dfdb;
-      border-radius: 5px;
-      text-align: center;
-    }
-
-    #btnContinuar {
-      display: none;
-      margin-top: 15px;
-      background-color: #28a745;
+    #btnContinuar{
+      display:none;
+      margin-top:15px;
+      background: linear-gradient(180deg, #34d399, #10b981);
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <div class="alerta">
-    Estás registrando una cuenta como <strong>cuidador</strong>.
+  <div class="card-form">
+    <h1>Registro de Cuidador</h1>
+    <div class="badge-top">Estás registrando una cuenta como <strong>cuidador</strong>.</div>
+
+    <form id="formRegistroCuidador" novalidate>
+      <!-- ===== Datos del Cuidador ===== -->
+      <div class="section">
+        <h3>Datos del Cuidador</h3>
+        
+        <label for="nombreCuidador">Nombre del cuidador:</label>
+        <input type="text" id="nombreCuidador" required placeholder="Tu nombre completo">
+
+        <label for="fechaNacCuidador">Fecha de nacimiento:</label>
+        <input type="date" id="fechaNacCuidador" required>
+
+        <label for="parentesco">Parentesco con el paciente:</label>
+        <input type="text" id="parentesco" required placeholder="Hijo(a), Esposo(a), etc.">
+
+        <label for="celularCuidador">Número de celular:</label>
+        <input type="tel" id="celularCuidador" required pattern="[0-9]{10}" placeholder="10 dígitos">
+
+        <label for="correo">Correo electrónico (Gmail):</label>
+        <input type="email" id="correo" required placeholder="tucorreo@gmail.com">
+
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" id="contrasena" required placeholder="Mínimo 8 caracteres" minlength="8">
+      </div>
+
+      <!-- ===== Datos del Paciente ===== -->
+      <div class="section">
+        <h3>Datos del Paciente</h3>
+        
+        <label for="nombrePaciente">Nombre del paciente:</label>
+        <input type="text" id="nombrePaciente" required placeholder="Ejemplo: Mariel">
+
+        <label for="fechaNacPaciente">Fecha de nacimiento:</label>
+        <input type="date" id="fechaNacPaciente" required>
+
+        <label for="condicionesMedicas">Condiciones médicas:</label>
+        <textarea id="condicionesMedicas" rows="3" required placeholder="Ejemplo: Alzheimer"></textarea>
+
+        <label for="nivelDemencia">Nivel de demencia:</label>
+        <select id="nivelDemencia" required>
+          <option value="">Seleccione una opción</option>
+          <option value="leve">Demencia leve</option>
+          <option value="moderada">Demencia moderada</option>
+          <option value="severa">Demencia severa</option>
+          <option value="otra">Otra</option>
+        </select>
+
+        <label>Contactos de emergencia:</label>
+        <div class="fila-contacto">
+          <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+          <input type="text" placeholder="Nombre del contacto">
+        </div>
+        <div class="fila-contacto">
+          <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+          <input type="text" placeholder="Nombre del contacto">
+        </div>
+        <div class="fila-contacto">
+          <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
+          <input type="text" placeholder="Nombre del contacto">
+        </div>
+
+        <label>Color para identificar al paciente:</label>
+        <div class="color-picker-container">
+          <input type="color" id="colorPaciente" required value="#3b82f6" style="height:42px; width:80px; padding:0; border-radius:8px;">
+          <div id="colorPreview" class="color-preview"></div>
+        </div>
+      </div>
+
+      <button type="submit">Registrarse</button>
+
+      <div id="codigoPaciente" class="codigo-generado"></div>
+      <button id="btnContinuar" type="button">Continuar</button>
+    </form>
   </div>
 
-  <h1>Registro de Cuidador</h1>
-
-  <form id="formRegistroCuidador">
-    <h3>Datos del Cuidador</h3>
-    <label for="nombreCuidador">Nombre del cuidador:</label>
-    <input type="text" id="nombreCuidador" required>
-
-    <label for="fechaNacCuidador">Fecha de nacimiento:</label>
-    <input type="date" id="fechaNacCuidador" required>
-
-    <label for="parentesco">Parentesco con el paciente:</label>
-    <input type="text" id="parentesco" required>
-
-    <label for="celularCuidador">Número de celular:</label>
-    <input type="tel" id="celularCuidador" required pattern="[0-9]{10}" placeholder="10 dígitos">
-
-    <label for="correo">Correo electrónico (Gmail):</label>
-    <input type="email" id="correo" required>
-
-    <label for="contrasena">Contraseña:</label>
-    <input type="password" id="contrasena" required>
-
-    <h3>Datos del Paciente</h3>
-    <label for="nombrePaciente">Nombre del paciente:</label>
-    <input type="text" id="nombrePaciente" required>
-
-    <label for="fechaNacPaciente">Fecha de nacimiento:</label>
-    <input type="date" id="fechaNacPaciente" required>
-
-    <label for="condicionesMedicas">Condiciones médicas:</label>
-    <textarea id="condicionesMedicas" rows="3" required></textarea>
-
-    <label for="nivelDemencia">Nivel de demencia:</label>
-    <select id="nivelDemencia" required>
-      <option value="">Seleccione una opción</option>
-      <option value="leve">Demencia leve</option>
-      <option value="moderada">Demencia moderada</option>
-      <option value="severa">Demencia severa</option>
-      <option value="otra">Otra</option>
-    </select>
-
-    <label>Contactos de emergencia:</label>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
-    <div class="fila-contacto">
-      <input type="tel" placeholder="Número (opcional)" pattern="[0-9]{10}">
-      <input type="text" placeholder="Nombre del contacto">
-    </div>
-
-    <label>Color para identificar al paciente:</label>
-    <div class="color-picker-container">
-      <input type="color" id="colorPaciente" required>
-      <div id="colorPreview" class="color-preview"></div>
-    </div>
-
-    <button type="submit">Registrarse</button>
-
-    <div id="codigoPaciente" class="codigo-generado" style="display: none;"></div>
-    <button id="btnContinuar" type="button">Continuar</button>
-  </form>
-
-  <script src="script.js">
-    
-  </script>
-
+	<script src="script.js">
+  
+	</script>
 </body>
 </html>
-

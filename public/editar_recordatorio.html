@@ -1,150 +1,190 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Editar Recordatorio - REMEMBERSOON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>REMEMBERSOON · Editar Recordatorio</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f1f5f9;
-      padding: 20px;
+    :root {
+      --bg: #0b1220;
+      --surface: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b8c2d9;
+      --primary: #6ea8fe;
+      --primary-strong: #3b82f6;
+      --accent: #22d3ee;
+      --blue-btn-light: #60a5fa;
+      --blue-btn-dark: #2563eb;
+      --gray-btn: rgba(255,255,255,.14);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
     }
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #1b2a4a 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 90%, #0e856a33 0%, transparent 60%),
+                  linear-gradient(160deg, #0b1220 0%, #0e1324 100%);
+      display:grid; place-items:center; padding:24px;
     }
 
-    h2 {
-      color: #1e40af;
-      text-align: center;
-      margin-bottom: 25px;
+    .wrap{ width:min(760px, 100%); }
+
+    .card{
+      backdrop-filter: saturate(135%) blur(8px);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
     }
 
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    .header{display:flex; align-items:center; gap:14px; margin-bottom:14px}
+    .logo{width:52px; height:52px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg, var(--primary-strong), var(--accent)); box-shadow:0 8px 20px rgba(59,130,246,.35); font-weight:800; color:#0b1220}
+    h1{margin:0; font-size:clamp(22px,3vw,28px); font-weight:800}
+    .sub{color:var(--muted); margin:2px 0 10px}
 
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
+    form{display:grid; gap:14px}
+    label{font-size:14px; color:var(--muted); display:block; margin-top:15px; font-weight:bold;}
+    .field{display:grid; gap:6px}
+    input[type="text"], input[type="date"], input[type="time"], select, textarea{
+      width:100%; padding:12px; border-radius:12px; background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.16); color:var(--text); outline:none;
     }
+    textarea{min-height:90px; resize:vertical}
 
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 25px;
-    }
+    .row{display:flex; gap:10px}
+    .row>*{flex:1}
 
-    button {
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      flex: 1;
-    }
+    .btn{appearance:none; border:0; border-radius:14px; padding:12px 16px; font-weight:600; cursor:pointer; transition:transform .08s ease, box-shadow .2s ease, background .2s ease; line-height:1; user-select:none}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(180deg,var(--blue-btn-light),var(--blue-btn-dark)); color:#f8fafc; box-shadow:0 6px 18px rgba(37,99,235,.35)}
+    .btn-secondary{background:transparent; color:var(--text); border:1px solid var(--gray-btn)}
 
-    .btn-guardar {
-      background-color: #2563eb;
-      color: white;
-    }
+    .notice{display:none; border:1px solid rgba(34,197,94,.35); background:rgba(16,185,129,.12); color:#d1fae5; padding:12px; border-radius:12px}
+    .notice.error{border-color:rgba(239,68,68,.45); background:rgba(239,68,68,.12); color:#fee2e2}
+    .loading{ text-align:center; color:var(--muted); padding:8px 0 }
 
-    .btn-cancelar {
-      background-color: #6b7280;
-      color: white;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
+    /* Contenedor para los días de la semana */
     .dias-semana {
       display: none;
       margin-top: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px;
     }
-
-    .dias-semana label {
+    /* Estilo para los checkboxes y sus etiquetas */
+    .form-check {
+      display: inline-block;
+      margin-right: 15px;
+    }
+    .form-check input {
+      width: auto;
+      margin-right: 5px;
+    }
+    .form-check label {
       font-weight: normal;
-      margin-right: 10px;
-    }
-
-    .loading {
-      text-align: center;
-      color: #6b7280;
-      padding: 20px;
+      color: var(--text);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Editar Recordatorio</h2>
-    <div id="loading" class="loading">Cargando recordatorio...</div>
-    
-    <form id="formRecordatorio" style="display: none;">
-      <label for="titulo">Título:</label>
-      <input type="text" id="titulo" required>
-
-      <label for="descripcion">Descripción:</label>
-      <textarea id="descripcion" rows="3"></textarea>
-
-      <label for="fecha">Fecha:</label>
-      <input type="date" id="fecha" required>
-
-      <label for="hora">Hora:</label>
-      <input type="time" id="hora" required>
-
-      <label for="repetir">Repetir:</label>
-      <select id="repetir">
-        <option value="una_vez">Una sola vez</option>
-        <option value="diario">Diariamente</option>
-        <option value="semanal">Semanalmente</option>
-      </select>
-
-      <div id="diasSemana" class="dias-semana">
-        <label>¿Qué días sonará?</label><br>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="0"><label>D</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="1"><label>L</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="2"><label>M</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="3"><label>M</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="4"><label>J</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="5"><label>V</label></div>
-        <div class="form-check"><input type="checkbox" name="dias_semana" value="6"><label>S</label></div>
+  <main class="wrap">
+    <section class="card">
+      <div class="header">
+        <div class="logo">RS</div>
+        <div>
+          <h1>Editar Recordatorio</h1>
+          <p class="sub">Ajusta título, fecha, hora, repetición y prioridad del recordatorio.</p>
+        </div>
       </div>
 
-      <label for="paciente">Paciente:</label>
-      <select id="paciente" required disabled> </select>
+      <div id="loading" class="loading">Cargando recordatorio...</div>
+      
+      <form id="formRecordatorio" style="display: none;" novalidate>
+        <div class="field">
+          <label for="titulo">Título</label>
+          <input type="text" id="titulo" required placeholder="Ej. Tomar medicamento" />
+        </div>
 
-      <label for="prioridad">Prioridad:</label>
-      <select id="prioridad">
-        <option value="baja">Baja</option>
-        <option value="media">Media</option>
-        <option value="alta">Alta</option>
-      </select>
+        <div class="field">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" rows="3" placeholder="Opcional"></textarea>
+        </div>
 
-      <div class="buttons">
-        <button type="button" class="btn-cancelar" onclick="cancelarEdicion()">Cancelar</button>
-        <button type="submit" class="btn-guardar">Guardar Cambios</button>
-      </div>
-    </form>
-  </div>
+        <div class="row">
+          <div class="field">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" required />
+          </div>
+          <div class="field">
+            <label for="hora">Hora</label>
+            <input type="time" id="hora" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="repetir">Repetir</label>
+            <select id="repetir">
+              <option value="una_vez">Una sola vez</option>
+              <option value="diario">Diariamente</option>
+              <option value="semanal">Semanalmente</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="paciente">Paciente</label>
+            <select id="paciente" required disabled></select>
+          </div>
+        </div>
+
+        <div id="diasSemana" class="dias-semana">
+          <label>¿Qué días sonará?</label><br>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="0"><label>D</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="1"><label>L</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="2"><label>M</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="3"><label>M</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="4"><label>J</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="5"><label>V</label></div>
+          <div class="form-check"><input type="checkbox" name="dias_semana" value="6"><label>S</label></div>
+        </div>
+
+        <div class="field">
+          <label for="prioridad">Prioridad</label>
+          <select id="prioridad">
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+        </div>
+
+        <div id="msg" class="notice"></div>
+        <div id="msgErr" class="notice error"></div>
+
+        <div class="row">
+          <button type="button" class="btn btn-secondary" id="btnCancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+      </form>
+    </section>
+  </main>
 
   <script>
     // Tu script original, con las correcciones integradas
     let recordatorioId = null;
     const repetirSelect = document.getElementById("repetir");
     const diasSemanaDiv = document.getElementById("diasSemana");
+    const msg = document.getElementById('msg');
+    const msgErr = document.getElementById('msgErr');
+
+    function showMsg(text){ msg.textContent = text; msg.style.display = 'block'; msgErr.style.display = 'none'; }
+    function showErr(text){ msgErr.textContent = text; msgErr.style.display = 'block'; msg.style.display = 'none'; }
 
     function obtenerIdDeURL() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -212,7 +252,7 @@
       }
 
       document.getElementById("loading").style.display = 'none';
-      document.getElementById("formRecordatorio").style.display = 'block';
+      document.getElementById("formRecordatorio").style.display = 'grid';
     }
 
     document.getElementById("formRecordatorio").addEventListener("submit", async function(e) {
@@ -247,14 +287,16 @@
         });
         const data = await response.json();
         if (data.success) {
-          alert('Recordatorio actualizado exitosamente');
-          window.location.href = "listaderecordatorios.html?actualizado=ok";
+          showMsg('Recordatorio actualizado exitosamente');
+          setTimeout(() => {
+            window.location.href = "listaderecordatorios.html?actualizado=ok";
+          }, 600);
         } else {
-          alert('Error al actualizar: ' + data.message);
+          showErr('Error al actualizar: ' + data.message);
         }
       } catch (error) {
         console.error('Error:', error);
-        alert('Error de conexión con el servidor');
+        showErr('Error de conexión con el servidor');
       }
     });
 
@@ -262,11 +304,11 @@
       diasSemanaDiv.style.display = (this.value === "semanal") ? "block" : "none";
     });
 
-    function cancelarEdicion() {
+    document.getElementById('btnCancel').addEventListener('click', function() {
       if (confirm('¿Seguro que quieres cancelar? Los cambios no guardados se perderán.')) {
         window.location.href = 'listaderecordatorios.html';
       }
-    }
+    });
 
     document.addEventListener("DOMContentLoaded", cargarRecordatorio);
   </script>

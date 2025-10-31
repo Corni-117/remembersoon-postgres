@@ -1,80 +1,92 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bienvenida - REMEMBERSOON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>REMEMBERSOON · Bienvenida</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
+    :root {
+      --bg: #0b1220;
+      --surface: rgba(255,255,255,0.08);
+      --text: #eaf0ff;
+      --muted: #b8c2d9;
+      --primary: #6ea8fe;
+      --primary-strong: #3b82f6;
+      --accent: #22d3ee;
+      --ok: #10b981;
+      --blue-btn-light: #60a5fa;
+      --blue-btn-dark: #2563eb;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
     }
 
-    .bienvenida-container {
-      background-color: #fff;
-      padding: 30px 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    *{box-sizing:border-box}
+    html, body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #1b2a4a 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 90%, #0e856a33 0%, transparent 60%),
+                  linear-gradient(160deg, #0b1220 0%, #0e1324 100%);
+      display:grid; place-items:center; padding:24px;
+    }
+
+    .wrap{ width:min(720px, 100%); }
+
+    .card{
+      backdrop-filter: saturate(135%) blur(8px);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
       text-align: center;
     }
 
-    h1 {
-      color: #007BFF;
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
+    .logo{ width:60px; height:60px; border-radius:14px; display:grid; place-items:center;
+      background: linear-gradient(135deg, var(--primary-strong), var(--accent));
+      box-shadow: 0 8px 20px rgba(59,130,246,.35);
+      font-weight:800; color:#0b1220; letter-spacing:.5px; margin: 0 auto 12px; }
 
-    p {
-      font-size: 18px;
-      color: #333;
-      margin-bottom: 30px;
-    }
+    h1{ margin: 0 0 6px; font-size: clamp(24px, 4vw, 32px); font-weight: 800; }
+    .sub{ color: var(--muted); margin: 0 0 20px; }
 
-    button {
-      padding: 12px 25px;
-      font-size: 16px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    .btn{ appearance:none; border:0; border-radius:14px; padding:12px 18px; font-weight:600; cursor:pointer;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease; line-height:1; user-select:none; }
+    .btn:active{ transform: translateY(1px); }
+    .btn-ok{ background: linear-gradient(180deg, var(--blue-btn-light), var(--blue-btn-dark)); color:#f8fafc; box-shadow: 0 6px 18px rgba(37,99,235,.35); }
 
-    button:hover {
-      background-color: #218838;
+    .name {
+      display:inline-flex; align-items:baseline; gap:6px; flex-wrap:wrap; justify-content:center;
     }
+    .name strong { font-weight:800; color:#fff; }
   </style>
 </head>
 <body>
-
-  <div class="bienvenida-container">
-    <h1>¡Bienvenido/a, <span id="nombreCuidador"></span>!</h1>
-    <p>Gracias por usar REMEMBERSOON</p>
-    <button onclick="irAlPanel()">Ir al panel del cuidador</button>
-  </div>
+  <main class="wrap">
+    <section class="card" role="region" aria-labelledby="title">
+      <div class="logo" aria-hidden="true">RS</div>
+      <h1 id="title">¡Bienvenido/a, <span id="nombreCuidador">Cuidador</span>!</h1>
+      <p class="sub">Gracias por usar <strong>REMEMBERSOON</strong>. Tu espacio para coordinar recordatorios y el cuidado diario.</p>
+      <button class="btn btn-ok" id="goPanel">Ir al panel del cuidador</button>
+    </section>
+  </main>
 
   <script>
-  // Recupera el usuario activo COMPLETO desde localStorage
-  const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
-  
-  if (usuarioActivo && usuarioActivo.nombre) {
-    document.getElementById("nombreCuidador").textContent = usuarioActivo.nombre;
-    console.log('Usuario en bienvenida:', usuarioActivo);
-  } else {
-    document.getElementById("nombreCuidador").textContent = "Cuidador";
-    console.error('No hay usuario activo en sesión');
-  }
+    // Recuperar usuario activo
+    const usuarioActivo = JSON.parse(localStorage.getItem('usuarioActivo'));
+    const nameEl = document.getElementById('nombreCuidador');
+    if (usuarioActivo && (usuarioActivo.nombre || usuarioActivo.name)) {
+      nameEl.textContent = usuarioActivo.nombre || usuarioActivo.name;
+    }
 
-  function irAlPanel() {
-    window.location.href = "Panelprueba.html";
-  }
-</script>
-
+    // Navegar al panel
+    document.getElementById('goPanel').addEventListener('click', () => {
+      window.location.href = 'Panelprueba.html';
+    });
+  </script>
 </body>
 </html>
