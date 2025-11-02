@@ -12,7 +12,7 @@ static async crear(recordatorioData) {
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *
   `;
-  // Pasamos 'dias_semana' como el octavo valor
+  // Pasamos 'dias_semana' como el octavo valor, opciones de creacion de recordatorios
   const values = [titulo, descripcion, fecha, hora, repetir, prioridad, paciente_id, dias_semana];
 
   try {

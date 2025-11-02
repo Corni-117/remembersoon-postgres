@@ -64,7 +64,7 @@ async function iniciarSesion() {
       alert(`¡Bienvenido/a, ${data.user.nombre}!`);
       localStorage.setItem('usuarioActivo', JSON.stringify(data.user));
       cerrarModales();
-      window.location.href = "bienvenida.html";
+      window.location.href = "bienveidainicioss.html";
     } else {
       alert(data.message || "Error en el login");
     }
@@ -264,7 +264,7 @@ if (document.getElementById("formRegistroCuidador")) {
   const btnContinuar = document.getElementById("btnContinuar");
   if (btnContinuar) {
     btnContinuar.addEventListener("click", function () {
-      window.location.href = "bienvenida.html"; 
+      window.location.href = "bienvenida.html"; //"bienvenida.html";
     });
   }
 })();

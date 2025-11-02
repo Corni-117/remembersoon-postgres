@@ -30,7 +30,7 @@ class Cuidador {
     }
   }
 
-  // Buscar cuidador por email
+  // Buscar cuidador por email, identificador único
   static async buscarPorEmail(email) {
     const query = 'SELECT * FROM cuidadores WHERE email = $1';
     const result = await pool.query(query, [email]);

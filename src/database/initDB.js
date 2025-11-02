@@ -10,7 +10,7 @@ async function initializeDatabase() {
     const sqlFilePath = path.join(__dirname, 'setup.sql');
     const sql = fs.readFileSync(sqlFilePath, 'utf8');
     
-    // Ejecutar el SQL
+    // Ejecutar el SQL y seguimiento de errores para la inicialización de cada tabla 
     await pool.query(sql);
     
     console.log('✅ Base de datos inicializada correctamente');
