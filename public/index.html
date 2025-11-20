@@ -137,7 +137,7 @@
   <main class="page">
     <section class="card">
       <div class="avatar">RS</div>
-      <h1>REMEMBERSOON 111</h1>
+      <h1>REMEMBERSOON </h1>
       <p class="lead">Tu asistente para el cuidado de personas con Alzheimer</p>
       <div class="actions">
         <button class="btn btn-primary" onclick="mostrarLogin()">Iniciar Sesión</button>
@@ -158,13 +158,13 @@
     </div>
   </div>
 
-  <!-- ===== MODAL: Registro ===== -->
+  <!-- ===== MODAL: Registro ===== 
   <div class="modal" id="modalRegistro" aria-hidden="true">
     <div class="modal-content">
       <span class="close" onclick="cerrarModales()">&times;</span>
       <iframe src="registro_cuidador.html" width="100%" height="600px" style="border:none;"></iframe>
     </div>
-  </div>
+  </div>  -->
 
   <!-- ===== MODAL: Acceso Paciente ===== -->
   <div class="modal" id="modalPaciente" aria-hidden="true">
@@ -183,8 +183,9 @@
       document.getElementById('modalLogin').style.display = 'block';
     }
 
-    function mostrarRegistro() {
-      document.getElementById('modalRegistro').style.display = 'block';
+    function irARegistro() {
+      // Esto redirige a la página en ventana completa
+      window.location.href = 'registro_cuidador.html';
     }
 
     function mostrarAccesoPaciente() {
@@ -193,7 +194,7 @@
 
     function cerrarModales() {
       document.getElementById('modalLogin').style.display = 'none';
-      document.getElementById('modalRegistro').style.display = 'none';
+      //document.getElementById('modalRegistro').style.display = 'none';
       document.getElementById('modalPaciente').style.display = 'none';
     }
 
